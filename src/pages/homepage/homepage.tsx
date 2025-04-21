@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { AuthContext } from "@/context/auth.context"
 import { Car, MapPin, User } from "lucide-react"
-import { NavLink } from "react-router-dom"
+import { useContext } from "react"
+import { useNavigate } from "react-router-dom"
 
 
 export default function Home() {
+
+    const navigate = useNavigate()
+    const auth = useContext(AuthContext) as { loggedInUser: any }
     return (
         <>
 
@@ -22,16 +27,26 @@ export default function Home() {
                                     </p>
                                 </div>
                                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                                    <NavLink to="/auth/register?type=customer">
-                                        <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                                            Book a Ride
-                                        </Button>
-                                    </NavLink>
-                                    <NavLink to="/auth/register?type=rider">
-                                        <Button size="lg" variant="outline">
-                                            Become a Driver
-                                        </Button>
-                                    </NavLink>
+
+                                    <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => {
+                                        if (auth.loggedInUser) {
+                                            navigate('/ride')
+                                        } else {
+                                            navigate('/login')
+                                        }
+                                    }}>
+                                        Book a Ride
+                                    </Button>
+                                    {/* </NavLink> */}
+                                    {/* <NavLink to="/register"> */}
+                                    <Button size="lg" variant="outline"
+                                        onClick={() => {
+                                            navigate('/register')
+
+                                        }}>
+                                        Become a Driver
+                                    </Button>
+                                    {/* </NavLink> */}
                                 </div>
                             </div>
                             <div className="mx-auto lg:ml-auto">

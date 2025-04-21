@@ -25,6 +25,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-le
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
 import "leaflet-routing-machine"
+import { UserNav } from "@/components/user-nav/user-nav"
 
 export interface SearchResultTypes {
     display_name: string
@@ -494,6 +495,7 @@ export default function MapPage() {
                         <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
                                 <User className="h-4 w-4 text-blue-700" />
+                                {/* <UserNav className='text-blue-700' /> */}
                             </div>
                         </div>
                     </div>

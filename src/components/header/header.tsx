@@ -8,6 +8,7 @@ import { Navigation, Menu, LogIn, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { UserNav } from "../user-nav/user-nav"
 
 const Header = () => {
     const auth = useContext(AuthContext) as { loggedInUser: any }
@@ -41,13 +42,16 @@ const Header = () => {
                 </NavLink>
 
                 {
-                    auth.loggedInUser && <>
-                        <NavLink to="/profile" className="hover:underline transition-all duration-300 ease-linear">
+                    // auth.loggedInUser && <>
+                    //     {/* <NavLink to="/profile" className="hover:underline transition-all duration-300 ease-linear">
 
 
-                            {auth.loggedInUser.name}
-                        </NavLink>
-                    </>
+                    //         {auth.loggedInUser.name}
+                    //     </NavLink> */}
+                    //     <UserNav />
+                    // </>
+                    auth?.loggedInUser ? (<>
+                        <UserNav /></>) : <></>
                 }
 
 

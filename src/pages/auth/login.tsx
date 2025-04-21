@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardTitle, CardHeader, CardFooter, CardContent } from "@/components/ui/card"
-import { Car, User } from "lucide-react"
+import { Car, LucideEye, LucideEyeOff, User } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { NavLink, useNavigate } from "react-router-dom"
 import { Label } from "@/components/ui/label"
@@ -20,6 +20,16 @@ const Login = () => {
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
     const { loggedInUser, setLoggedInUser } = useContext(AuthContext) as { loggedInUser: any, setLoggedInUser: Function }
+
+    const [showPassword, setShowPassword] = useState(false)
+    const [showRiderPassword, setShowRiderPassword] = useState(false)
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev)
+
+    }
+    const toggleRiderPasswordVisibility = () => {
+        setShowRiderPassword((prev) => !prev)
+    }
 
     const LoginDTO = Yup.object({
         username: Yup.string().email('Invalid email').required('Email is required'),
@@ -79,7 +89,7 @@ const Login = () => {
 
 
 
-   
+
     return <>
 
         <div className="container flex h-screen w-screen flex-col items-center justify-center ">
@@ -132,14 +142,27 @@ const Login = () => {
                                                 Forgot password?
                                             </NavLink>
                                         </div>
-                                        <TextInputField
+                                        {/* <TextInputField
                                             type={InputType.PASSWORD}
                                             name="password"
                                             control={control}
                                             placeholder="Enter your password"
                                             errMsg={errors?.password?.message as string}
 
-                                        />
+                                        /> */}
+                                        <div className="relative">
+                                            <TextInputField
+                                                type={showPassword ? InputType.TEXT : InputType.PASSWORD}
+                                                name="password"
+                                                control={control}
+                                                placeholder="Enter your password"
+                                                errMsg={errors?.password?.message as string}
+
+                                            />
+                                            <button type="button" className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:bg-text-gray-50" onClick={togglePasswordVisibility}>
+                                                {showPassword ? <LucideEyeOff size={16} /> : <LucideEye size={16} />}
+                                            </button>
+                                        </div>
                                         {/* <Input id="customer-password" type="password" required /> */}
                                     </div>
                                 </CardContent>
@@ -172,7 +195,7 @@ const Login = () => {
                                             type={InputType.EMAIL}
                                             name="username"
                                             control={control}
-                                            placeholder="Enter your password"
+                                            placeholder="Enter your email"
                                             errMsg={errors?.username?.message as string}
 
                                         />
@@ -185,14 +208,19 @@ const Login = () => {
                                                 Forgot password?
                                             </NavLink>
                                         </div>
-                                        <TextInputField
-                                            type={InputType.PASSWORD}
-                                            name="password"
-                                            control={control}
-                                            placeholder="Enter your password"
-                                            errMsg={errors?.password?.message as string}
+                                        <div className="relative">
+                                            <TextInputField
+                                                type={showRiderPassword ? InputType.TEXT : InputType.PASSWORD}
+                                                name="password"
+                                                control={control}
+                                                placeholder="Enter your password"
+                                                errMsg={errors?.password?.message as string}
 
-                                        />
+                                            />
+                                            <button type="button" className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:bg-text-gray-50" onClick={toggleRiderPasswordVisibility}>
+                                                {showRiderPassword ? <LucideEyeOff size={16} /> : <LucideEye size={16} />}
+                                            </button>
+                                        </div>
                                     </div>
                                 </CardContent>
                                 <CardFooter className="flex flex-col">

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Label } from "@/components/ui/label" // Fixed import from radix to shadcn
-import { Car, Upload, User } from "lucide-react"
+import { Car, LucideEye, LucideEyeOff, Upload, User } from "lucide-react"
 import { useState } from "react"
 import { NavLink } from "react-router-dom"
 import * as Yup from "yup"
@@ -19,6 +19,25 @@ const Register = () => {
     const [registeredUser, setRegisteredUser] = useState()
     const [showOtpModal, setShowOtpModal] = useState(false)
     const [laoding, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+    const [showRiderPassword, setShowRiderPassword] = useState(false)
+    const [showRiderConfirmPassword, setShowRiderConfirmPassword] = useState(false)
+
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev)
+    }
+    const toggleConfirmPasswordVisibility = () => {
+        setShowConfirmPassword((prev) => !prev)
+    }
+    const toggleRiderPasswordVisibility = () => {
+        setShowRiderPassword((prev) => !prev)
+    }
+    const toggleRiderConfirmPasswordVisibility = () => {
+        setShowRiderConfirmPassword((prev) => !prev)
+    }
+
 
     const registerDTO = Yup.object({
         name: Yup.string().min(2).max(50).required("Name is required"),
@@ -167,24 +186,34 @@ const Register = () => {
                                     <div className="space-y-2">
                                         <Label htmlFor="customer-password">Password</Label>
                                         {/* <Input id="customer-password" type="password" required /> */}
-                                        <TextInputField
-                                            type={InputType.PASSWORD}
-                                            name="password"
-                                            control={control}
-                                            placeholder="Enter your password"
-                                            errMsg={errors?.password?.message as string}
-                                        />
+                                        <div className="relative">
+                                            <TextInputField
+                                                type={showPassword ? InputType.TEXT : InputType.PASSWORD}
+                                                name="password"
+                                                control={control}
+                                                placeholder="Enter your password"
+                                                errMsg={errors?.password?.message as string}
+                                            />
+                                            <button type="button" className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:bg-text-gray-50" onClick={togglePasswordVisibility}>
+                                                {showPassword ? <LucideEyeOff size={16} /> : <LucideEye size={16} />}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="customer-confirm-password">Confirm Password</Label>
                                         {/* <Input id="customer-confirm-password" type="password" required /> */}
-                                        <TextInputField
-                                            type={InputType.PASSWORD}
-                                            name="confirmPassword"
-                                            control={control}
-                                            placeholder="Confirm your password"
-                                            errMsg={errors?.confirmPassword?.message as string}
-                                        />
+                                        <div className="relative">
+                                            <TextInputField
+                                                type={showConfirmPassword ? InputType.TEXT : InputType.PASSWORD}
+                                                name="confirmPassword"
+                                                control={control}
+                                                placeholder="Confirm your password"
+                                                errMsg={errors?.confirmPassword?.message as string}
+                                            />
+                                            <button type="button" onClick={toggleConfirmPasswordVisibility} className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:bg-text-gray-50">
+                                                {showConfirmPassword ? <LucideEyeOff size={16} /> : <LucideEye size={16} />}
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="customer-image">Profile Image (Optional)</Label>
@@ -265,23 +294,40 @@ const Register = () => {
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="rider-password">Password</Label>
-                                        <TextInputField
-                                            type={InputType.PASSWORD}
-                                            name="password"
-                                            control={control}
-                                            placeholder="Create a password"
-                                            errMsg={errors?.password?.message as string}
-                                        />
+                                        <div className="relative">
+                                            <TextInputField
+                                                type={showRiderPassword ? InputType.TEXT : InputType.PASSWORD}
+                                                name="password"
+                                                control={control}
+                                                placeholder="Create a password"
+                                                errMsg={errors?.password?.message as string}
+                                            />
+                                            <button type="button" onClick={toggleRiderPasswordVisibility} className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:bg-text-gray-50">
+                                                {
+                                                    showRiderPassword ? <LucideEyeOff size={16} /> : <LucideEye size={16} />
+                                                }
+
+                                            </button>
+                                        </div>
+
+
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="rider-confirm-password">Confirm Password</Label>
-                                        <TextInputField
-                                            type={InputType.PASSWORD}
-                                            name="confirmPassword"
-                                            control={control}
-                                            placeholder="Confirm your password"
-                                            errMsg={errors?.confirmPassword?.message as string}
-                                        />
+                                        <div className="relative">
+                                            <TextInputField
+                                                type={showRiderConfirmPassword ? InputType.TEXT : InputType.PASSWORD}
+                                                name="confirmPassword"
+                                                control={control}
+                                                placeholder="Confirm your password"
+                                                errMsg={errors?.confirmPassword?.message as string}
+                                            />
+                                            <button type="button" onClick={toggleRiderConfirmPasswordVisibility} className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:bg-text-gray-50">
+                                                {
+                                                    showRiderConfirmPassword ? <LucideEyeOff size={16} /> : <LucideEye size={16} />
+                                                }
+                                            </button>
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="rider-nid">National ID Number</Label>
@@ -396,10 +442,12 @@ const Register = () => {
                     </TabsContent>
                 </Tabs>
             </div>
-            {showOtpModal && (
-                <OTPModal open={showOtpModal} onOpenChange={(open) => setShowOtpModal(open)} user={registeredUser} role={activeTab as "customer" | "rider"} />
-            )}
-        </div>
+            {
+                showOtpModal && (
+                    <OTPModal open={showOtpModal} onOpenChange={(open) => setShowOtpModal(open)} user={registeredUser} role={activeTab as "customer" | "rider"} />
+                )
+            }
+        </div >
     )
 }
 

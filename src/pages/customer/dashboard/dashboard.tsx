@@ -2,19 +2,24 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Car, History, Home, LogOut, MapPin, Menu, User } from "lucide-react"
-import { useState } from "react"
-import { NavLink } from "react-router-dom"
+import { AuthContext } from "@/context/auth.context"
+import { Car, History, Home,  LogOut, MapPin, Menu, Navigation, User } from "lucide-react"
+import { useContext, useState } from "react"
+import { NavLink, useNavigate } from "react-router-dom"
 
 export default function CustomerDashboard() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const auth = useContext(AuthContext) as {
+        loggedInUser: any
+    }
+    const navigate = useNavigate()
 
     return (
         <div className="flex min-h-screen flex-col md:flex-row">
             {/* Mobile sidebar toggle */}
             <div className="md:hidden flex items-center justify-between p-4 border-b">
                 <NavLink to="/" className="flex items-center gap-2 font-bold text-lg text-primary">
-                    <Car className="h-5 w-5" />
+                    <Navigation className="h-5 w-5" />
                     <span>RideX</span>
                 </NavLink>
                 <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
@@ -26,8 +31,11 @@ export default function CustomerDashboard() {
             <div
                 className={`${isSidebarOpen ? "block" : "hidden"} md:block w-full md:w-64 bg-blue-50 dark:bg-blue-950 p-4 md:h-screen md:sticky md:top-0`}
             >
-                <div className="hidden md:flex items-center gap-2 font-bold text-lg text-primary mb-8">
-                    <Car className="h-5 w-5" />
+                <div className="hidden md:flex items-center gap-2 font-bold text-lg text-primary mb-8  hover:cursor-pointer transition-transform hover:scale-105"
+                    onClick={() => {
+                        navigate("/")
+                    }}>
+                    <Navigation className="h-5 w-5" />
                     <span>RideX</span>
                 </div>
 
@@ -47,7 +55,9 @@ export default function CustomerDashboard() {
                         to="/customer/profile"
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900"
                     >
-                        <User className="h-5 w-5" />
+                        {
+                            auth.loggedInUser?.image ? <img src={auth.loggedInUser.image} /> : <User className="h-5 w-5" />
+                        }
                         <span>Profile</span>
                     </NavLink>
                     <NavLink
@@ -62,6 +72,13 @@ export default function CustomerDashboard() {
                         <NavLink
                             to="/"
                             className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900 text-red-600 dark:text-red-400"
+                            onClick={() => {
+                                localStorage.removeItem("token")
+                                localStorage.removeItem('refToken')
+                                auth.loggedInUser = null
+
+
+                            }}
                         >
                             <LogOut className="h-5 w-5" />
                             <span>Logout</span>
