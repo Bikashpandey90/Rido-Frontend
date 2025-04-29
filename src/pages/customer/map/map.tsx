@@ -216,7 +216,7 @@ function RoutingMachine({ waypoints, setRouteInfo }: { waypoints: L.LatLng[]; se
                 routeWhileDragging: false,
                 fitSelectedRoutes: true,
                 showAlternatives: false,
-                createMarker: () => null, // Don't create default markers
+                // createMarker: () => null, // Don't create default markers
                 router: L.Routing.osrmv1({
                     serviceUrl: "https://router.project-osrm.org/route/v1",
                 }),
@@ -511,7 +511,8 @@ export default function MapPage() {
                         >
                             <TileLayer
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                // url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                url="https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=7bc8f939ae3246b29e516ccf0e07c43d"
                             />
                             <MapUpdater center={markers.geocode} />
 

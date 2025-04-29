@@ -30,6 +30,8 @@ export interface TextInputFieldProps {
     type?: InputType,
     placeholder?: string,
     className?: string,
+    id?: string,
+    onChangeEvent?: (event: React.ChangeEvent<HTMLInputElement>) => void
 
 
 }
@@ -41,6 +43,7 @@ export const TextInputField = ({ control, errMsg, name, type = InputType.TEXT, p
 
 
 
+
     });
     return (<>
         <input
@@ -48,6 +51,35 @@ export const TextInputField = ({ control, errMsg, name, type = InputType.TEXT, p
             placeholder={placeholder}
             type={type}
             {...field}
+
+
+
+        />
+        <span className="text-red-400">
+            {errMsg}
+        </span>
+    </>)
+
+}
+
+export const LocationInputField = ({ control, errMsg, name, type = InputType.TEXT, placeholder, className = '', id, onChangeEvent }: TextInputFieldProps) => {
+
+    const { field } = useController({
+        control: control,
+        name: name,
+
+
+
+
+    });
+    return (<>
+        <input
+            className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm ${className}`}
+            placeholder={placeholder}
+            type={type}
+            {...field}
+            id={id}
+            onChange={onChangeEvent || (() => {})}
 
 
         />

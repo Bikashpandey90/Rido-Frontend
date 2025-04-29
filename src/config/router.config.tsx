@@ -10,7 +10,10 @@ import CustomerDashboard from "@/pages/customer/dashboard/dashboard";
 import MapPage from "@/pages/customer/map/map";
 import RiderDashboard from "@/pages/rider/dashboard/dashboard";
 import RiderNavigationPage from "@/pages/rider/rider-nav/rider-navigation";
+// import MapCheck from "@/pages/customer/map/map-check";
+// import NewMapPage from "@/pages/customer/map/new-map-check";
 import MapCheck from "@/pages/customer/map/map-check";
+import ProfilePage from "@/pages/customer/profile/profile";
 
 
 
@@ -49,6 +52,9 @@ const Routing: FC = () => {
                 }, {
                     path: '/map-check',
                     element: <MapCheck />
+                }, {
+                    path: '/profile',
+                    element: <ProfilePage />
                 }
             ]
         }

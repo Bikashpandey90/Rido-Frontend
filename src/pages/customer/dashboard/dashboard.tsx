@@ -3,9 +3,26 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { AuthContext } from "@/context/auth.context"
-import { Car, History, Home,  LogOut, MapPin, Menu, Navigation, User } from "lucide-react"
-import { useContext, useState } from "react"
+import { Car, History, Home, LogOut, MapPin, Menu, Navigation, User } from "lucide-react"
+import { useContext, useEffect, useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
+import mapsSvc from "../map/maps.services"
+
+export interface SavedLocation {
+    _id: string
+    title: string
+    locationName: string
+    location: {
+        type: string
+        coordinates: [number, number]
+    },
+    isDefault: boolean,
+    status: string,
+    userId: string
+
+
+
+}
 
 export default function CustomerDashboard() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -13,6 +30,23 @@ export default function CustomerDashboard() {
         loggedInUser: any
     }
     const navigate = useNavigate()
+
+    const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([])
+
+    const fetchSavedLocations = async () => {
+        try {
+            const result = await mapsSvc.fetchSavedLocations()
+            setSavedLocations(result.detail)
+
+        } catch (exception) {
+            console.log("Error fetching saved locations:", exception)
+        }
+
+    }
+
+    useEffect(() => {
+        fetchSavedLocations()
+    }, [])
 
     return (
         <div className="flex min-h-screen flex-col md:flex-row">
@@ -55,9 +89,9 @@ export default function CustomerDashboard() {
                         to="/customer/profile"
                         className="flex items-center gap-3 p-3 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900"
                     >
-                        {
-                            auth.loggedInUser?.image ? <img src={auth.loggedInUser.image} /> : <User className="h-5 w-5" />
-                        }
+
+                        <User className="h-5 w-5" />
+
                         <span>Profile</span>
                     </NavLink>
                     <NavLink
@@ -91,10 +125,12 @@ export default function CustomerDashboard() {
             <div className="flex-1 p-4 md:p-8">
                 <div className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-bold">Welcome, John!</h1>
+                        <h1 className="text-2xl font-bold">Welcome, {auth.loggedInUser?.name.split(' ')[0]}</h1>
                         <div className="flex items-center gap-2">
                             <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <User className="h-6 w-6 text-blue-700" />
+                                {
+                                    auth.loggedInUser?.image ? <img src={auth.loggedInUser.image} className="h-10 w-10 rounded-full" /> : <User className="h-5 w-5 text-blue-700" />
+                                }
                             </div>
                         </div>
                     </div>
@@ -172,21 +208,23 @@ export default function CustomerDashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {[
-                                    { name: "Home", address: "123 Main St, Anytown" },
-                                    { name: "Work", address: "456 Office Blvd, Business District" },
-                                    { name: "Gym", address: "789 Fitness Ave, Healthyville" },
-                                ].map((location, index) => (
-                                    <div key={index} className="flex items-center gap-4 p-3 border rounded-lg">
-                                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <MapPin className="h-5 w-5 text-blue-700" />
+                                {
+                                    // [
+                                    //     { name: "Home", address: "123 Main St, Anytown" },
+                                    //     { name: "Work", address: "456 Office Blvd, Business District" },
+                                    //     { name: "Gym", address: "789 Fitness Ave, Healthyville" },
+                                    // ]
+                                    savedLocations?.map((location, index) => (
+                                        <div key={index} className="flex items-center gap-4 p-3 border rounded-lg">
+                                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <MapPin className="h-5 w-5 text-blue-700" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium truncate">{location.title}</p>
+                                                <p className="text-sm text-muted-foreground truncate">{location.locationName}</p>
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium truncate">{location.name}</p>
-                                            <p className="text-sm text-muted-foreground truncate">{location.address}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
                             </div>
                         </CardContent>
                     </Card>
