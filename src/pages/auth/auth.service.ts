@@ -90,6 +90,16 @@ class AuthService extends HttpService {
             console.error(exception)
         }
     }
+    updateStatus = async (data: any) => {
+        try {
+
+            const response = await this.patchRequest('/auth/update-ride-status-rider', data, { auth: true })
+            return response.data
+
+        } catch (exception) {
+            console.error(exception)
+        }
+    }
 
 }
 const authSvc = new AuthService()

@@ -25,7 +25,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-le
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
 import "leaflet-routing-machine"
-import { UserNav } from "@/components/user-nav/user-nav"
 
 export interface SearchResultTypes {
     display_name: string
@@ -216,7 +215,7 @@ function RoutingMachine({ waypoints, setRouteInfo }: { waypoints: L.LatLng[]; se
                 routeWhileDragging: false,
                 fitSelectedRoutes: true,
                 showAlternatives: false,
-                // createMarker: () => null, // Don't create default markers
+                createMarker: () => null, // Don't create default markers
                 router: L.Routing.osrmv1({
                     serviceUrl: "https://router.project-osrm.org/route/v1",
                 }),
@@ -579,6 +578,7 @@ export default function MapPage() {
                                     <div className="space-y-2">
                                         <Label htmlFor="pickup">Pickup Location</Label>
                                         <div className="flex gap-2 relative">
+
                                             <Input
                                                 id="pickup"
                                                 placeholder="Current location"

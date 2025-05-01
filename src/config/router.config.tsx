@@ -12,8 +12,11 @@ import RiderDashboard from "@/pages/rider/dashboard/dashboard";
 import RiderNavigationPage from "@/pages/rider/rider-nav/rider-navigation";
 // import MapCheck from "@/pages/customer/map/map-check";
 // import NewMapPage from "@/pages/customer/map/new-map-check";
-import MapCheck from "@/pages/customer/map/map-check";
+// import MapCheck from "@/pages/customer/map/map-check";
 import ProfilePage from "@/pages/customer/profile/profile";
+import RiderProfile from "@/pages/rider/profile/profile";
+import NewMapPage from "@/pages/customer/map/new-map-check";
+import RiderPage from "@/pages/rider/rider-map/rider-map";
 
 
 
@@ -51,10 +54,16 @@ const Routing: FC = () => {
                     element: <RiderNavigationPage />
                 }, {
                     path: '/map-check',
-                    element: <MapCheck />
+                    element: <NewMapPage />
                 }, {
                     path: '/profile',
                     element: <ProfilePage />
+                }, {
+                    path: '/rider/profile',
+                    element: <RiderProfile />
+                }, {
+                    path: '/rider-map',
+                    element: <RiderPage />
                 }
             ]
         }

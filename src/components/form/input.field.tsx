@@ -21,7 +21,8 @@ export enum InputType {
     URL = 'url',
     TEL = 'tel',
     FILE = 'file',
-    NUMBER = 'number'
+    NUMBER = 'number',
+    TIME = 'time'
 }
 export interface TextInputFieldProps {
     control: any,
@@ -62,30 +63,73 @@ export const TextInputField = ({ control, errMsg, name, type = InputType.TEXT, p
 
 }
 
-export const LocationInputField = ({ control, errMsg, name, type = InputType.TEXT, placeholder, className = '', id, onChangeEvent }: TextInputFieldProps) => {
+// export const LocationInputField = ({ control, errMsg, name, type = InputType.TEXT, placeholder, className = '', id, onChangeEvent }: TextInputFieldProps) => {
 
+//     const { field } = useController({
+//         control: control,
+//         name: name,
+
+
+
+
+//     });
+//     return (<>
+//         <input
+//             className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm ${className}`}
+//             placeholder={placeholder}
+//             type={type}
+//             {...field}
+//             id={id}
+//             onChange={onChangeEvent || (() => { })}
+
+
+//         />
+//         <span className="text-red-400">
+//             {errMsg}
+//         </span>
+//     </>)
+
+// }
+export interface LocationInputFieldProps extends Omit<TextInputFieldProps, "type"> {
+    onLocationSelect?: () => void
+    icon?: React.ReactNode
+    disabled?: boolean
+}
+
+export const LocationInputField = ({
+    control,
+    errMsg,
+    name,
+    placeholder,
+    className = "",
+    onLocationSelect,
+    icon,
+    disabled = false,
+}: LocationInputFieldProps) => {
     const { field } = useController({
         control: control,
         name: name,
+    })
 
-
-
-
-    });
-    return (<>
-        <input
-            className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm ${className}`}
-            placeholder={placeholder}
-            type={type}
-            {...field}
-            id={id}
-            onChange={onChangeEvent || (() => {})}
-
-
-        />
-        <span className="text-red-400">
-            {errMsg}
-        </span>
-    </>)
-
+    return (
+        <div className="relative">
+            <input
+                className={`flex h-10 w-full rounded-md border border-input bg-transparent pl-3 pr-10 py-2 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm ${className}`}
+                placeholder={placeholder}
+                type="text"
+                disabled={disabled}
+                {...field}
+            />
+            {icon && (
+                <button
+                    type="button"
+                    onClick={onLocationSelect}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                >
+                    {icon}
+                </button>
+            )}
+            {errMsg && <span className="text-red-400 text-xs mt-1 block">{errMsg}</span>}
+        </div>
+    )
 }

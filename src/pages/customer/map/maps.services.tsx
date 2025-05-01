@@ -61,18 +61,29 @@ class MapsService extends HttpService {
         }
     }
 
-    async acceptRide(rideId: string) {
+    async acceptRide(data: any) {
         try {
-            const response = await this.patchRequest('/ride/accept-ride', rideId, { auth: true })
+            const response = await this.patchRequest('/ride/accept-ride', data, { auth: true })
             return response.data
 
         } catch (exception) {
             throw exception
         }
     }
-    
 
-    
+    async getRideDetail(rideId: string) {
+        try {
+            const response = await this.getRequest(`/ride/${rideId}`, { auth: true })
+            return response.data
+
+        }
+        catch (exception) {
+            throw exception
+        }
+    }
+
+
+
 
 
 

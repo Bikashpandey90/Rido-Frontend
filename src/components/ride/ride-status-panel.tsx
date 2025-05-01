@@ -1,9 +1,9 @@
-import { Car, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { Car, User } from "lucide-react"
 
-export default function RideConfirmedPanel() {
+export default function RideStatusPanel() {
     return (
         <div className="p-4 space-y-6">
             <div className="text-center space-y-2">

@@ -43,7 +43,6 @@ abstract class HttpService {
             this.setHeaders(config)
             const axiosResponse: AxiosCustomResponse = await axiosInstance.post(url, data, {
                 headers: this.headers
-
             })
             return axiosResponse
 
