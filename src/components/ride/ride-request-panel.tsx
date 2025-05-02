@@ -46,6 +46,7 @@ export default function RideRequestPanel({
     const [ride, setRide] = useState<any>(null)
     const [pickupLocationName, setPickupLocationName] = useState<string>("")
     const [dropoffLocationName, setDropoffLocationName] = useState<string>("")
+    const [cancelling, setCancelling] = useState(false)
 
     const rideRequestDTO = Yup.object({
         // pickUpLocation: Yup.object({
@@ -168,6 +169,28 @@ export default function RideRequestPanel({
             }
         }
     }, [ride])
+
+    const cancelRide = async (rideId: string) => {
+        setCancelling(true)
+        try {
+
+            const response = await mapsSvc.cancelRideRequest(rideId)
+            console.log("Ride cancelled successfully:", response)
+
+            if (response?.status === 'RIDE_CANCELLED') {
+                setIsRideRequested(false)
+                setIsWaitingForDriver(false)
+                setRide(null)
+            }
+
+
+        } catch (exception) {
+            console.error("Error cancelling ride:", exception)
+        }
+        finally {
+            setCancelling(false)
+        }
+    }
 
     return (
         <div className="w-full md:w-96 bg-background border-t md:border-t-0 md:border-l md:h-screen md:overflow-y-auto">
@@ -587,7 +610,11 @@ export default function RideRequestPanel({
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button variant="destructive" className="w-full">
+                            <Button variant="destructive" className="w-full"
+                                disabled={cancelling}
+                                onClick={() => {
+                                    cancelRide(ride?._id)
+                                }}>
                                 Cancel Ride
                             </Button>
                         </CardFooter>

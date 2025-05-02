@@ -65,7 +65,7 @@ export default function RiderProfile() {
                         <div className="relative px-4 sm:px-6 pb-6">
                             <Avatar className="h-20 w-20 sm:h-28 sm:w-28 border-4 border-background absolute -top-10 sm:-top-14 ring-2 ring-muted/10">
                                 <AvatarImage src={auth?.loggedInUser?.image} alt="User" className="object-cover" />
-                                <AvatarFallback className="text-xl sm:text-2xl">{auth.loggedInUser.name.split(" ").map((n: string) => n[0]).join("")}</AvatarFallback>
+                                <AvatarFallback className="text-xl sm:text-2xl">{auth?.loggedInUser?.name.split(" ").map((n: string) => n[0]).join("")}</AvatarFallback>
                             </Avatar>
 
                             <div className="pt-12 sm:ml-32 sm:pt-4 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
@@ -303,15 +303,15 @@ export default function RiderProfile() {
                                     <div className="space-y-2 text-emerald-900">
                                         <p className="font-medium text-lg">
                                             {/* {vehicleType === "car" ? "Modern Cartoon Cup Car - Darsche 91" : "Ducati Diavel Dark 1200CC"} */}
-                                            {auth.loggedInUser.vehicle.model}
+                                            {auth.loggedInUser?.vehicle?.model}
                                         </p>
                                         <div className="flex items-center gap-2">
                                             <Badge variant="outline" className="border-emerald-200 text-emerald-700">
                                                 {/* {vehicleType === "car" ? "Sports Car" : "Motorcycle"} */}
-                                                {auth.loggedInUser.vehicle.vehicleType === "bike" ? "Motorcycle" : "Car"}
+                                                {auth?.loggedInUser?.vehicle?.vehicleType === "bike" ? "Motorcycle" : "Car"}
                                             </Badge>
                                             <Badge variant="outline" className="border-emerald-200 text-emerald-700">
-                                                {auth.loggedInUser.vehicle.vehicleType === "bike" ? "2 Seats" : "4 Seats"}
+                                                {auth?.loggedInUser?.vehicle?.vehicleType === "bike" ? "2 Seats" : "4 Seats"}
                                             </Badge>
                                         </div>
                                         <div className="grid grid-cols-2 gap-2 mt-3">
@@ -319,7 +319,7 @@ export default function RiderProfile() {
                                                 <p className="text-xs text-emerald-600">License Plate</p>
                                                 <p className="font-medium">
                                                     {/* {vehicleType === "car" ? "NYC-4578" : "NYC-9821"} */}
-                                                    {auth.loggedInUser.vehicle.plateNumber}
+                                                    {auth?.loggedInUser?.vehicle?.plateNumber}
 
                                                 </p>
                                             </div>
@@ -373,7 +373,7 @@ export default function RiderProfile() {
                                 <div className="bg-muted/30 p-4 sm:p-5 rounded-xl">
                                     <h3 className="font-medium mb-3">Vehicle Features</h3>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {auth.loggedInUser.vehicle.vehicleType === "car" ? (
+                                        {auth?.loggedInUser?.vehicle?.vehicleType === "car" ? (
                                             <>
                                                 <div className="flex items-center gap-2">
                                                     <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -439,7 +439,7 @@ export default function RiderProfile() {
                         <CardContent className="p-4 sm:p-6">
                             <div className="flex items-center justify-between mb-4 sm:mb-5">
                                 <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
-                                    {auth.loggedInUser.vehicle.vehicleType === "car" ? (
+                                    {auth?.loggedInUser?.vehicle?.vehicleType === "car" ? (
                                         <Car className="h-5 w-5 text-indigo-500" />
                                     ) : (
                                         <Bike className="h-5 w-5 text-indigo-500" />
@@ -453,14 +453,14 @@ export default function RiderProfile() {
 
                             <div className="flex flex-col items-center justify-center">
                                 {/* Vehicle Type Selector */}
-                                <VehicleSelector onSelect={setVehicleType} selectedType={auth.loggedInUser.vehicle.vehicleType} />
+                                <VehicleSelector onSelect={setVehicleType} selectedType={auth?.loggedInUser?.vehicle?.vehicleType} />
 
                                 {/* 3D Vehicle Model */}
                                 <div className="w-full rounded-xl mb-4 overflow-hidden">
-                                    <VehicleModel vehicleType={auth.loggedInUser.vehicle.vehicleType} height={300} />
+                                    <VehicleModel vehicleType={auth?.loggedInUser?.vehicle?.vehicleType} height={300} />
                                 </div>
 
-                                <h3 className="text-xl font-bold text-center mb-1">{auth.loggedInUser.vehicle.model}</h3>
+                                <h3 className="text-xl font-bold text-center mb-1">{auth?.loggedInUser?.vehicle?.model}</h3>
                                 <p className="text-muted-foreground text-center mb-4">
                                     {currentVehicle.year} • {currentVehicle.color} • {currentVehicle.seats}
                                 </p>
@@ -468,7 +468,7 @@ export default function RiderProfile() {
                                 <div className="grid grid-cols-2 gap-4 w-full">
                                     <div className="bg-muted/30 p-3 rounded-xl text-center">
                                         <p className="text-sm text-muted-foreground">License Plate</p>
-                                        <p className="font-medium">{auth.loggedInUser.vehicle.plateNumber}</p>
+                                        <p className="font-medium">{auth?.loggedInUser?.vehicle?.plateNumber}</p>
                                     </div>
                                     <div className="bg-muted/30 p-3 rounded-xl text-center">
                                         <p className="text-sm text-muted-foreground">Last Inspection</p>

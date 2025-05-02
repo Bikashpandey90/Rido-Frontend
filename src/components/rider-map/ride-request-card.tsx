@@ -14,6 +14,7 @@ interface RideRequestCardProps {
         pickUpLocation: any
         dropOffLocation: any
         distance: number
+        distanceTime: number
         duration: number
         fare: number
         RideStatus: "pending" | "accepted" | "in_progress" | "completed",
@@ -125,7 +126,7 @@ export default function RideRequestCard({
                     </div>
                     <div>
                         <p className="text-xs text-muted-foreground">Duration</p>
-                        <p className="font-medium">{Math.round(request.duration / 60)} min</p>
+                        <p className="font-medium">{request?.distanceTime ? request.distanceTime : 12} min</p>
                     </div>
                     <div>
                         <p className="text-xs text-muted-foreground">Fare</p>
@@ -138,8 +139,7 @@ export default function RideRequestCard({
                     <>
                         <Button className="flex-1 bg-green-600 hover:bg-green-700" onClick={() => {
                             acceptRide(request._id)
-
-                            // onAccept(request._id)
+                            onAccept(request._id)
 
                         }
 
@@ -152,7 +152,7 @@ export default function RideRequestCard({
                     </>
                 )}
 
-                {request.RideStatus === "accepted" && (
+                {status === "accepted" && (
                     <>
                         <Button className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => onNavigate(request._id)}>
                             Navigate to Pickup

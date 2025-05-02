@@ -81,6 +81,15 @@ class MapsService extends HttpService {
             throw exception
         }
     }
+    async cancelRideRequest(rideId: string) {
+        try {
+            const response = await this.patchRequest(`/ride/cancel-ride/${rideId}`, { rideId } ,{ auth: true })
+            return response.data
+
+        } catch (exception) {
+            throw exception
+        }
+    }
 
 
 
