@@ -1,14 +1,14 @@
-"use client"
+
 
 import { useState, useEffect } from "react"
 import { NavLink } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, Menu, Navigation } from "lucide-react"
+import { ChevronLeft, Navigation } from "lucide-react"
 import MapView from "@/components/ride/map-view"
 import RideRequestPanel from "@/components/ride/ride-request-panel"
 
 export default function NewMapPage() {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const [isSidebarOpen] = useState(false)
     const [routeInfo, setRouteInfo] = useState<any>(null)
     const [showDirectionsCard, setShowDirectionsCard] = useState(false)
 
@@ -57,23 +57,23 @@ export default function NewMapPage() {
                     <ChevronLeft className="h-5 w-5" />
                     <span>Back</span>
                 </NavLink>
-                <div className="font-bold text-lg">Request Ride</div>
+                {/* <div className="font-bold text-lg">Request Ride</div>
                 <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                     <Menu className="h-5 w-5" />
-                </Button>
+                </Button> */}
             </div>
 
             {/* Mobile sidebar */}
-            {isSidebarOpen && (
-                <div className="md:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-                    <div className="fixed inset-y-0 right-0 w-3/4 max-w-xs bg-background p-6 shadow-lg">
-                        {/* Sidebar content */}
-                        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}>
-                            <ChevronLeft className="h-5 w-5" />
-                        </Button>
-                        {/* Navigation links would go here */}
-                    </div>
-                </div>
+            {isSidebarOpen && (<></>
+                // <div className="md:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+                //     <div className="fixed inset-y-0 right-0 w-3/4 max-w-xs bg-background p-6 shadow-lg">
+                //         {/* Sidebar content */}
+                //         <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}>
+                //             <ChevronLeft className="h-5 w-5" />
+                //         </Button>
+                //         {/* Navigation links would go here */}
+                //     </div>
+                // </div>
             )}
 
             <div className="flex flex-1 flex-col md:flex-row">

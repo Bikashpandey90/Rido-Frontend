@@ -1,13 +1,16 @@
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { NavLink } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, Menu, Navigation } from "lucide-react"
 import RiderMapView from "@/components/rider-map/rider-map-view"
 import RiderStatusPanel from "@/components/rider-map/rider-status-panel"
 import riderMapService from "./rider-map-service"
+import { RideContext } from "@/context/ride.context"
 
 export default function RiderPage() {
+
+    const { hasAcceptedRide } = useContext(RideContext) as { hasAcceptedRide: boolean }
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isOnline, setIsOnline] = useState(false)
     const [routeInfo, setRouteInfo] = useState<any>(null)
@@ -64,8 +67,13 @@ export default function RiderPage() {
     };
 
     useEffect(() => {
-        console.log("From use Effect",latitude, longitude);
+        console.log("From useEffect", latitude, longitude);
         if (latitude !== null && longitude !== null) {
+            if (hasAcceptedRide) {
+                console.log("Ride accepted, stopping fetch requests.");
+                return; // Exit early if a ride is accepted
+            }
+
             fetchRideRequests();
             const interval = setInterval(() => {
                 fetchRideRequests();
@@ -73,7 +81,7 @@ export default function RiderPage() {
 
             return () => clearInterval(interval);
         }
-    }, [latitude, longitude]);
+    }, [latitude, longitude, hasAcceptedRide]);
 
     // Watch user's position
     useEffect(() => {

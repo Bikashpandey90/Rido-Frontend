@@ -83,7 +83,19 @@ class MapsService extends HttpService {
     }
     async cancelRideRequest(rideId: string) {
         try {
-            const response = await this.patchRequest(`/ride/cancel-ride/${rideId}`, { rideId } ,{ auth: true })
+            const response = await this.patchRequest(`/ride/cancel-ride/${rideId}`, { rideId }, { auth: true })
+            return response.data
+
+        } catch (exception) {
+            throw exception
+        }
+    }
+    async makePayment(rideId: string, method: string, amount: number) {
+        try {
+
+            const transactionCode = `${Date.now()}${Math.floor(1000 + Math.random() * 9000)}`;
+
+            const response = await this.postRequest(`/ride/payment/${rideId}`, { method, amount, transactionCode }, { auth: true })
             return response.data
 
         } catch (exception) {

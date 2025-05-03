@@ -7,12 +7,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Clock, Car, ChevronLeft, CreditCard, MapPin, User } from "lucide-react"
+import { Clock, Car, ChevronLeft, CreditCard, MapPin, User, CheckCircle, Star, DollarSign, Wallet } from "lucide-react"
 import LocationSearch from "./location-search"
 import mapsSvc from "@/pages/customer/map/maps.services"
 import * as Yup from "yup"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Textarea } from "@/components/ui/textarea"
 
 interface RideRequestPanelProps {
     latitude: number | null
@@ -47,6 +49,13 @@ export default function RideRequestPanel({
     const [pickupLocationName, setPickupLocationName] = useState<string>("")
     const [dropoffLocationName, setDropoffLocationName] = useState<string>("")
     const [cancelling, setCancelling] = useState(false)
+    const [paymentMethod, setPaymentMethod] = useState<"cash" | "esewa">("cash")
+    const [rating, setRating] = useState<number>(0)
+    const [reviewText, setReviewText] = useState<string>("")
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false)
+    const [isPaymentProcessing, setIsPaymentProcessing] = useState(false)
+    const [paymentComplete, setPaymentComplete] = useState(false)
+    const [reviewComplete, setReviewComplete] = useState(false)
 
     const rideRequestDTO = Yup.object({
         // pickUpLocation: Yup.object({
@@ -173,22 +182,269 @@ export default function RideRequestPanel({
     const cancelRide = async (rideId: string) => {
         setCancelling(true)
         try {
-
             const response = await mapsSvc.cancelRideRequest(rideId)
             console.log("Ride cancelled successfully:", response)
 
-            if (response?.status === 'RIDE_CANCELLED') {
+            if (response?.status === "RIDE_CANCELLED") {
                 setIsRideRequested(false)
                 setIsWaitingForDriver(false)
                 setRide(null)
             }
-
-
         } catch (exception) {
             console.error("Error cancelling ride:", exception)
-        }
-        finally {
+        } finally {
             setCancelling(false)
+        }
+    }
+
+    const handlePayment = async (paymentMethod: string) => {
+        setIsPaymentProcessing(true)
+        try {
+            // Simulate payment processing
+            await new Promise((resolve) => setTimeout(resolve, 1500))
+
+
+            const response = await mapsSvc.makePayment(ride?._id, paymentMethod, ride?.fare)
+            console.log(response.detail)
+            console.log(`Processing ${paymentMethod} payment for ride: ${ride?._id}`)
+            setPaymentComplete(true)
+        } catch (error) {
+            console.error("Payment processing error:", error)
+            alert("Payment processing failed. Please try again.")
+        } finally {
+            setIsPaymentProcessing(false)
+        }
+    }
+
+    const submitReview = async () => {
+        if (rating === 0) {
+            alert("Please select a rating before submitting")
+            return
+        }
+
+        setIsSubmittingReview(true)
+        try {
+            // Simulate review submission
+            await new Promise((resolve) => setTimeout(resolve, 1000))
+
+            // Here you would normally call your review API
+            // const response = await mapsSvc.submitReview(ride?._id, {
+            //   rating,
+            //   comment: reviewText
+            // });
+
+
+            console.log(`Submitting review for ride ${ride?._id}: ${rating} stars, "${reviewText}"`)
+            setReviewComplete(true)
+
+            // Reset ride state after review is complete
+            setTimeout(() => {
+                setIsRideRequested(false)
+                setRide(null)
+                setPaymentComplete(false)
+                setReviewComplete(false)
+                setRating(0)
+                setReviewText("")
+            }, 2000)
+        } catch (error) {
+            console.error("Review submission error:", error)
+            alert("Failed to submit review. Please try again.")
+        } finally {
+            setIsSubmittingReview(false)
+        }
+    }
+
+    // Render stars for rating
+    const renderStars = () => {
+        return Array(5)
+            .fill(0)
+            .map((_, index) => (
+                <button
+                    key={index}
+                    type="button"
+                    onClick={() => setRating(index + 1)}
+                    className="focus:outline-none"
+                    aria-label={`Rate ${index + 1} stars`}
+                >
+                    <Star className={`h-8 w-8 ${index < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`} />
+                </button>
+            ))
+    }
+
+    // Render completed ride view with payment and review options
+    const renderCompletedRide = () => {
+        if (reviewComplete) {
+            return (
+                <div className="p-4 space-y-6">
+                    <div className="text-center space-y-4">
+                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                            <CheckCircle className="h-8 w-8 text-green-600" />
+                        </div>
+                        <h2 className="text-xl font-bold">Thank You!</h2>
+                        <p className="text-muted-foreground">Your review has been submitted successfully.</p>
+                    </div>
+                </div>
+            )
+        }
+
+        if (!paymentComplete) {
+            return (
+                <div className="p-4 space-y-6">
+                    <div className="text-center space-y-4">
+                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                            <CheckCircle className="h-8 w-8 text-green-600" />
+                        </div>
+                        <h2 className="text-xl font-bold">Ride Completed</h2>
+                        <p className="text-muted-foreground">Please complete your payment</p>
+                    </div>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Payment</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-between">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Total Fare</p>
+                                    <p className="font-medium text-lg">Nrs {ride?.fare}</p>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-3">
+                                <Label>Select Payment Method</Label>
+                                <RadioGroup
+                                    value={paymentMethod}
+                                    onValueChange={(value) => setPaymentMethod(value as "cash" | "esewa")}
+                                    className="grid grid-cols-2 gap-4"
+                                >
+                                    <div>
+                                        <RadioGroupItem value="cash" id="cash" className="peer sr-only" />
+                                        <Label
+                                            htmlFor="cash"
+                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                        >
+                                            <DollarSign className="mb-3 h-6 w-6" />
+                                            Cash
+                                        </Label>
+                                    </div>
+                                    <div>
+                                        <RadioGroupItem value="esewa" id="esewa" className="peer sr-only" />
+                                        <Label
+                                            htmlFor="esewa"
+                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                                        >
+                                            <Wallet className="mb-3 h-6 w-6" />
+                                            eSewa
+                                        </Label>
+                                    </div>
+                                </RadioGroup>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button
+                                className="w-full bg-green-600 hover:bg-green-700"
+                                onClick={() => handlePayment(paymentMethod)}
+                                disabled={isPaymentProcessing}
+                            >
+                                {isPaymentProcessing ? "Processing..." : `Pay with ${paymentMethod === "cash" ? "Cash" : "eSewa"}`}
+                            </Button>
+                        </CardFooter>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Ride Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-between">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Pickup</p>
+                                    <p className="font-medium">{ride?.pickUpLocation?.name?.split(" ").slice(0, 3).join(" ")}...</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-sm text-muted-foreground">Destination</p>
+                                    <p className="font-medium">{ride?.dropOffLocation?.name?.split(" ").slice(0, 3).join(" ")}...</p>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="flex justify-between">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Driver</p>
+                                    <p className="font-medium">{ride?.rider?.name}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-sm text-muted-foreground">Vehicle</p>
+                                    <p className="font-medium">{ride?.vehicleDetails?.model}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            )
+        } else {
+            return (
+                <div className="p-4 space-y-6">
+                    <div className="text-center space-y-4">
+                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                            <CheckCircle className="h-8 w-8 text-green-600" />
+                        </div>
+                        <h2 className="text-xl font-bold">Payment Successful</h2>
+                        <p className="text-muted-foreground">Please rate your experience</p>
+                    </div>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Rate Your Driver</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                    {ride?.rider?.image ? (
+                                        <img
+                                            src={ride.rider.image || "/placeholder.svg"}
+                                            className="h-11 w-11 rounded-full object-contain"
+                                            alt={ride.rider.name}
+                                        />
+                                    ) : (
+                                        <User className="h-6 w-6 text-blue-700" />
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="font-medium">{ride?.rider?.name}</p>
+                                    <p className="text-sm text-muted-foreground">{ride?.vehicleDetails?.model}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center space-x-1">{renderStars()}</div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="review">Additional Comments (Optional)</Label>
+                                <Textarea
+                                    id="review"
+                                    placeholder="Share your experience..."
+                                    value={reviewText}
+                                    onChange={(e) => setReviewText(e.target.value)}
+                                    rows={4}
+                                />
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button
+                                className="w-full bg-blue-600 hover:bg-blue-700"
+                                onClick={submitReview}
+                                disabled={isSubmittingReview}
+                            >
+                                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+                            </Button>
+
+                        </CardFooter>
+                    </Card>
+                </div>
+            )
         }
     }
 
@@ -219,9 +475,7 @@ export default function RideRequestPanel({
                             <div className="flex justify-between">
                                 <div>
                                     <p className="text-sm text-muted-foreground">Pickup</p>
-                                    <p className="font-medium">
-                                        {ride?.pickUpLocation?.name?.split(" ").slice(0, 3).join(" ")}...
-                                    </p>
+                                    <p className="font-medium">{ride?.pickUpLocation?.name?.split(" ").slice(0, 3).join(" ")}...</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-sm text-muted-foreground">Destination</p>
@@ -309,7 +563,7 @@ export default function RideRequestPanel({
                                                 type="submit"
                                                 disabled={isSubmitting}
                                             >
-                                                Continue
+                                                {isSubmitting ? "Requesting a ride..." : "Continue"}
                                             </Button>
                                         </div>
                                     </TabsContent>
@@ -520,107 +774,123 @@ export default function RideRequestPanel({
                         </div>
                     )}
                 </div>
-            ) : (
-                <div className="p-4 space-y-6">
-                    <div className="text-center space-y-2">
-                        <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto">
-                            <Car className="h-8 w-8 text-blue-700" />
+            ) : // Check if ride is completed
+                ride?.RideStatus === "completed" ? (
+                    renderCompletedRide()
+                ) : (
+                    <div className="p-4 space-y-6">
+                        <div className="text-center space-y-2">
+                            <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto">
+                                <Car className="h-8 w-8 text-blue-700" />
+                            </div>
+                            <h2 className="text-xl font-bold">
+                                {ride?.RideStatus === "ongoing" ? "Hang on tight" : "Your ride is on the way!"}
+                            </h2>
+                            <p className="text-muted-foreground">
+                                {ride?.RideStatus === "ongoing"
+                                    ? "Rider will navigate you to your destination"
+                                    : "Driver will arrive in approximately 3 minutes"}
+                            </p>
                         </div>
-                        <h2 className="text-xl font-bold">Your ride is on the way!</h2>
-                        <p className="text-muted-foreground">Driver will arrive in approximately 3 minutes</p>
-                    </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Driver Information</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                    {
-                                        ride?.rider?.image ? <img src={ride.rider.image} className="h-11 w-11 rounded-full object-contain" /> : <User className="h-6 w-6 text-blue-700" />
-                                    }
-
-                                </div>
-                                <div>
-                                    <p className="font-medium">{ride?.rider?.name}</p>
-                                    <div className="flex items-center">
-                                        <p className="text-sm text-muted-foreground">4.9 ★</p>
-                                        <span className="mx-1">•</span>
-                                        <p className="text-sm text-muted-foreground">{ride?.vehicleDetails?.model}</p>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Driver Information</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                        {ride?.rider?.image ? (
+                                            <img
+                                                src={ride.rider.image || "/placeholder.svg"}
+                                                className="h-11 w-11 rounded-full object-contain"
+                                                alt={ride.rider.name}
+                                            />
+                                        ) : (
+                                            <User className="h-6 w-6 text-blue-700" />
+                                        )}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">{ride?.rider?.name}</p>
+                                        <div className="flex items-center">
+                                            <p className="text-sm text-muted-foreground">4.9 ★</p>
+                                            <span className="mx-1">•</span>
+                                            <p className="text-sm text-muted-foreground">{ride?.vehicleDetails?.model}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="flex justify-between">
-                                <div>
-                                    <p className="text-sm text-muted-foreground">License Plate</p>
-                                    <p className="font-medium">{ride?.vehicleDetails?.plateNumber}</p>
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">License Plate</p>
+                                        <p className="font-medium">{ride?.vehicleDetails?.plateNumber}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm text-muted-foreground">Car Color</p>
+                                        <p className="font-medium">Silver</p>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-sm text-muted-foreground">Car Color</p>
-                                    <p className="font-medium">Silver</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button variant="outline" className="flex-1"
+                            </CardContent>
+                            <CardFooter className="flex justify-between">
+                                <Button
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => {
+                                        window.open(`tel:${ride?.rider?.phone}`, "_blank")
+                                    }}
+                                >
+                                    Call
+                                </Button>
+                                <Button variant="outline" className="flex-1 ml-2">
+                                    Message
+                                </Button>
+                            </CardFooter>
+                        </Card>
 
-                                onClick={() => {
-                                    window.open(`tel:${ride?.rider?.phone}`, "_blank")
-
-                                }}>
-                                Call
-                            </Button>
-                            <Button variant="outline" className="flex-1 ml-2">
-                                Message
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Ride Details</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Pickup</p>
-                                    <p className="font-medium">{ride?.pickUpLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Ride Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Pickup</p>
+                                        <p className="font-medium">{ride?.pickUpLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm text-muted-foreground">Destination</p>
+                                        <p className="font-medium">{ride?.dropOffLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-sm text-muted-foreground">Destination</p>
-                                    <p className="font-medium">{ride?.dropOffLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
-                                </div>
-                            </div>
 
-                            <Separator />
+                                <Separator />
 
-                            <div className="flex justify-between">
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Estimated Price</p>
-                                    <p className="font-medium">
-                                        Nrs {ride?.fare}
-                                    </p>
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Estimated Price</p>
+                                        <p className="font-medium">Nrs {ride?.fare}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm text-muted-foreground">Payment Method</p>
+                                        <p className="font-medium">Credit Card (*4242)</p>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-sm text-muted-foreground">Payment Method</p>
-                                    <p className="font-medium">Credit Card (*4242)</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button variant="destructive" className="w-full"
-                                disabled={cancelling}
-                                onClick={() => {
-                                    cancelRide(ride?._id)
-                                }}>
-                                Cancel Ride
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                </div>
-            )}
+                            </CardContent>
+                            <CardFooter>
+                                <Button
+                                    variant="destructive"
+                                    className="w-full"
+                                    disabled={cancelling}
+                                    onClick={() => {
+                                        cancelRide(ride?._id)
+                                    }}
+                                >
+                                    {cancelling ? "Cancelling..." : "Cancel Ride"}
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    </div>
+                )}
         </div>
     )
 }
