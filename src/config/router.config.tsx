@@ -17,6 +17,8 @@ import ProfilePage from "@/pages/customer/profile/profile";
 import RiderProfile from "@/pages/rider/profile/profile";
 import NewMapPage from "@/pages/customer/map/new-map-check";
 import RiderPage from "@/pages/rider/rider-map/rider-map";
+import ReviewsPage from "@/pages/review/review-page";
+import RidesPage from "@/pages/rides/rides-page";
 
 
 
@@ -64,6 +66,13 @@ const Routing: FC = () => {
                 }, {
                     path: '/rider-map',
                     element: <RiderPage />
+                }, {
+                    path: '/reviews',
+                    element: <ReviewsPage />
+
+                }, {
+                    path: '/rides',
+                    element: <RidesPage />
                 }
             ]
         }
@@ -75,7 +84,7 @@ const Routing: FC = () => {
 
     return <>
         <QueryClientProvider client={queryClient}>
-            
+
 
 
             <RouterProvider router={router} />

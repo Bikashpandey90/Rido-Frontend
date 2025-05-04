@@ -1,4 +1,5 @@
 import { useController } from "react-hook-form"
+import { Textarea } from "../ui/textarea"
 
 
 interface LabelProps {
@@ -133,3 +134,36 @@ export const LocationInputField = ({
         </div>
     )
 }
+export interface TextAreaFieldProps {
+    name: string,
+    control: any,
+    defaultValue?: string,
+    errMsg?: string,
+    placeholder?: string,
+    className?: string,
+    rows?: number,
+
+
+}
+
+export const TextAreaField = ({ control, name, defaultValue = '', placeholder, errMsg = '', className = '', rows = 4 }: TextAreaFieldProps) => {
+    const { field } = useController({
+        control: control,
+        name: name,
+        defaultValue: defaultValue
+    })
+    return (<>
+        <Textarea
+            placeholder={placeholder}
+            {...field}
+            rows={rows}
+            className={className}
+        />
+        <span className="text-red-500 text-sm">{errMsg}</span>
+
+
+    </>)
+
+}
+
+

@@ -1,4 +1,3 @@
-"use client"
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -7,14 +6,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Clock, Car, ChevronLeft, CreditCard, MapPin, User, CheckCircle, Star, DollarSign, Wallet } from "lucide-react"
+import { Clock, Car, ChevronLeft, CreditCard, MapPin, User, CheckCircle, Star, DollarSign, Wallet, Plus, Bike, MoreVertical, Check, Trash, Edit, Home, Building2 } from "lucide-react"
 import LocationSearch from "./location-search"
 import mapsSvc from "@/pages/customer/map/maps.services"
 import * as Yup from "yup"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Textarea } from "@/components/ui/textarea"
+import reviewSvc from "@/pages/review/review.svc"
+import { Textarea } from "../ui/textarea"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
 
 interface RideRequestPanelProps {
     latitude: number | null
@@ -27,6 +28,31 @@ interface RideRequestPanelProps {
     setDestLongitude: (lon: number | null) => void
     setShowRoute: (show: boolean) => void
     routeInfo: any
+}
+export interface RecentRideLocations {
+    dropOffLocation: {
+        type: "Point",
+        coordinates: [number, number],
+        name: String,
+        _id: String
+    },
+    _id: String
+
+}
+export interface SavedLocations {
+    location: {
+        coordinates: [
+            number,
+            number
+        ],
+        type: "Point"
+    },
+    _id: String,
+    userId: String,
+    locationName: String,
+    isDefault: Boolean,
+    title: "work" | 'home' | "other" | 'recent',
+    status: "active" | 'inactive',
 }
 
 export default function RideRequestPanel({
@@ -56,6 +82,8 @@ export default function RideRequestPanel({
     const [isPaymentProcessing, setIsPaymentProcessing] = useState(false)
     const [paymentComplete, setPaymentComplete] = useState(false)
     const [reviewComplete, setReviewComplete] = useState(false)
+    const [savedLocations, setSavedLocations] = useState<SavedLocations[]>([])
+    const [recentLocations, setRecentLocations] = useState<RecentRideLocations[]>([])
 
     const rideRequestDTO = Yup.object({
         // pickUpLocation: Yup.object({
@@ -69,6 +97,15 @@ export default function RideRequestPanel({
         // vehicleType: Yup.string().default("bike").required("Vehicle type is required"),
     })
 
+    const reviewCreateDTO = Yup.object({
+        rating: Yup.number().required("Rating is required"),
+        comment: Yup.string().optional(),
+    })
+
+    const reviewFormSchema = Yup.object({
+        comment: Yup.string().optional(),
+    })
+
     const {
         control,
         handleSubmit,
@@ -77,6 +114,11 @@ export default function RideRequestPanel({
     } = useForm({
         resolver: yupResolver(rideRequestDTO),
     })
+
+    const reviewForm = useForm({
+        resolver: yupResolver(reviewFormSchema),
+    })
+
     const handleRequestRide = () => {
         setIsWaitingForDriver(false)
         setIsRideRequested(true)
@@ -149,6 +191,42 @@ export default function RideRequestPanel({
         }
     }
 
+    const submitReviewForm = async (comment: string, riderId: string, rideId: string) => {
+        if (rating === 0) {
+            alert("Please select a rating before submitting")
+            return
+        }
+
+        setIsSubmittingReview(true)
+        try {
+            const payload = {
+                rating: rating,
+                comment: comment,
+                rider: riderId,
+                ride: rideId,
+            }
+
+            const response = await reviewSvc.createReview(payload)
+            console.log("Review submitted successfully:", response)
+            setReviewComplete(true)
+
+            // Reset ride state after review is complete
+            setTimeout(() => {
+                setIsRideRequested(false)
+                setRide(null)
+                setPaymentComplete(false)
+                setReviewComplete(false)
+                setRating(0)
+                setReviewText("")
+            }, 3000)
+        } catch (exception) {
+            console.error("Review submission error:", exception)
+            alert("Failed to submit review. Please try again.")
+        } finally {
+            setIsSubmittingReview(false)
+        }
+    }
+
     const loadRideDetail = async () => {
         try {
             if (!ride) {
@@ -203,7 +281,6 @@ export default function RideRequestPanel({
             // Simulate payment processing
             await new Promise((resolve) => setTimeout(resolve, 1500))
 
-
             const response = await mapsSvc.makePayment(ride?._id, paymentMethod, ride?.fare)
             console.log(response.detail)
             console.log(`Processing ${paymentMethod} payment for ride: ${ride?._id}`)
@@ -216,43 +293,80 @@ export default function RideRequestPanel({
         }
     }
 
-    const submitReview = async () => {
-        if (rating === 0) {
-            alert("Please select a rating before submitting")
-            return
-        }
-
-        setIsSubmittingReview(true)
+    const getSavedLocations = async () => {
         try {
-            // Simulate review submission
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            const response = await mapsSvc.fetchSavedLocations()
+            setSavedLocations(response.detail)
+            console.log(response.detail)
 
-            // Here you would normally call your review API
-            // const response = await mapsSvc.submitReview(ride?._id, {
-            //   rating,
-            //   comment: reviewText
-            // });
-
-
-            console.log(`Submitting review for ride ${ride?._id}: ${rating} stars, "${reviewText}"`)
-            setReviewComplete(true)
-
-            // Reset ride state after review is complete
-            setTimeout(() => {
-                setIsRideRequested(false)
-                setRide(null)
-                setPaymentComplete(false)
-                setReviewComplete(false)
-                setRating(0)
-                setReviewText("")
-            }, 2000)
-        } catch (error) {
-            console.error("Review submission error:", error)
-            alert("Failed to submit review. Please try again.")
-        } finally {
-            setIsSubmittingReview(false)
+        } catch (exception) {
+            console.error("Error fetching saved locations:", exception)
         }
     }
+    const getRecentLocations = async () => {
+        try {
+            const response = await mapsSvc.fetchRecentRidesLocations()
+            setRecentLocations(response.detail)
+            console.log(response.detail)
+
+        } catch (exception) {
+            console.error("Error fetching saved locations:", exception)
+        }
+    }
+    useEffect(() => {
+        getSavedLocations()
+        getRecentLocations()
+    }, [])
+
+    const getLocationIcon = (title: string) => {
+        switch (title) {
+            case "home":
+                return <Home className="h-4 w-4 text-blue-700" />
+            case "work":
+                return <Building2 className="h-4 w-4 text-blue-700" />
+            case "recent":
+                return <Bike className="h-4 w-4 text-blue-700" />
+            default:
+                return <MapPin className="h-4 w-4 text-blue-700" />
+        }
+    }
+
+    // const submitReview = async () => {
+    //     if (rating === 0) {
+    //         alert("Please select a rating before submitting")
+    //         return
+    //     }
+
+    //     setIsSubmittingReview(true)
+    //     try {
+    //         // Simulate review submission
+    //         await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    //         // Here you would normally call your review API
+    //         // const response = await mapsSvc.submitReview(ride?._id, {
+    //         //   rating,
+    //         //   comment: reviewText
+    //         // });
+
+    //         console.log(`Submitting review for ride ${ride?._id}: ${rating} stars, "${reviewText}"`)
+    //         setReviewComplete(true)
+
+    //         // Reset ride state after review is complete
+    //         setTimeout(() => {
+    //             setIsRideRequested(false)
+    //             setRide(null)
+    //             setPaymentComplete(false)
+    //             setReviewComplete(false)
+    //             setRating(0)
+    //             setReviewText("")
+    //         }, 2000)
+    //     } catch (error) {
+    //         console.error("Review submission error:", error)
+    //         alert("Failed to submit review. Please try again.")
+    //     } finally {
+    //         setIsSubmittingReview(false)
+    //     }
+    // }
 
     // Render stars for rating
     const renderStars = () => {
@@ -424,23 +538,28 @@ export default function RideRequestPanel({
                             <div className="space-y-2">
                                 <Label htmlFor="review">Additional Comments (Optional)</Label>
                                 <Textarea
+                                    name="comment"
                                     id="review"
                                     placeholder="Share your experience..."
-                                    value={reviewText}
+                                    // errMsg={errors?.comment?.message as string}
                                     onChange={(e) => setReviewText(e.target.value)}
-                                    rows={4}
                                 />
                             </div>
                         </CardContent>
                         <CardFooter>
                             <Button
                                 className="w-full bg-blue-600 hover:bg-blue-700"
-                                onClick={submitReview}
+                                onClick={() => {
+                                    if (rating === 0) {
+                                        alert("Please select a rating before submitting")
+                                        return
+                                    }
+                                    submitReviewForm(reviewText, ride?.rider?._id, ride?._id)
+                                }}
                                 disabled={isSubmittingReview}
                             >
                                 {isSubmittingReview ? "Submitting..." : "Submit Review"}
                             </Button>
-
                         </CardFooter>
                     </Card>
                 </div>
@@ -586,194 +705,293 @@ export default function RideRequestPanel({
                                     </TabsContent>
                                 </Tabs>
 
-                                <div className="pt-4">
-                                    <h3 className="font-medium mb-2">Saved Locations</h3>
-                                    <div className="space-y-2">
-                                        {[
-                                            { name: "Home", address: "123 Main St, Anytown" },
-                                            { name: "Work", address: "456 Office Blvd, Business District" },
-                                        ].map((location, index) => (
-                                            <div
-                                                key={index}
-                                                className="flex items-center gap-3 p-2 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
-                                            >
-                                                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <MapPin className="h-4 w-4 text-blue-700" />
+                                <div className="bg-white dark:bg-gray-950 rounded-xl p-4 shadow-sm border">
+                                    <h3 className="font-semibold text-lg mb-3">Saved Locations</h3>
+                                    <div className="space-y-3">
+                                        {savedLocations && savedLocations.length > 0 ? (
+                                            savedLocations.map((location, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors duration-200"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                                            {getLocationIcon(location?.title)}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium">{location.title.charAt(0).toUpperCase() + location.title.slice(1)}</p>
+                                                            <p className="text-sm text-muted-foreground">{location.locationName}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                <MoreVertical className="h-4 w-4" />
+                                                                <span className="sr-only">Open menu</span>
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => { }}>
+                                                                <Edit className="h-4 w-4 mr-2" />
+                                                                Edit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem
+                                                                className="text-red-600 dark:text-red-400"
+                                                                onClick={() => { }}
+                                                            >
+                                                                <Trash className="h-4 w-4 mr-2" />
+                                                                Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
                                                 </div>
-                                                <div>
-                                                    <p className="font-medium">{location.name}</p>
-                                                    <p className="text-xs text-muted-foreground">{location.address}</p>
-                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-32 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                                                <p className="text-sm text-muted-foreground text-center mt-4">No saved locations available.</p>
+                                                <Button className="mt-3" variant="secondary" onClick={() => { }}>
+                                                    <Plus className="h-4 w-4 mr-2" />
+                                                    Add Saved Location
+                                                </Button>
                                             </div>
-                                        ))}
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Recent Locations Section */}
+                                <div className="bg-white dark:bg-gray-950 rounded-xl p-4 shadow-sm border">
+                                    <h3 className="font-semibold text-lg mb-3">Recent Locations</h3>
+                                    <div className="space-y-3">
+                                        {recentLocations && recentLocations.length > 0 ? (
+                                            recentLocations.map((location, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors duration-200"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                                            <MapPin className="h-4 w-4 text-blue-700" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium">Recent</p>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {location.dropOffLocation.name.length > 30
+                                                                    ? `${location.dropOffLocation.name.substring(0, 30)}...`
+                                                                    : location.dropOffLocation.name}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                <MoreVertical className="h-4 w-4" />
+                                                                <span className="sr-only">Open menu</span>
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            <DropdownMenuItem onClick={() => { }}>
+                                                                <Check className="h-4 w-4 mr-2" />
+                                                                Save
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuSeparator />
+                                                            <DropdownMenuItem
+                                                                className="text-red-600 dark:text-red-400"
+                                                                onClick={() => { }}
+                                                            >
+                                                                <Trash className="h-4 w-4 mr-2" />
+                                                                Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-32 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                                                <p className="text-sm text-muted-foreground text-center mt-4">No recent locations available.</p>
+                                                <Button className="mt-3" variant="secondary" onClick={() => { }}>
+                                                    <Bike className="h-4 w-4 mr-2" />
+                                                    Start a Ride...
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </form>
                         </div>
-                    )}
+                    )
+                    }
 
-                    {step === "vehicle" && (
-                        <div className="space-y-4">
-                            <div className="flex items-center">
-                                <Button variant="ghost" size="icon" onClick={() => setStep("location")} className="mr-2">
-                                    <ChevronLeft className="h-5 w-5" />
-                                </Button>
-                                <h2 className="text-xl font-bold">Choose Vehicle Type</h2>
-                            </div>
-
-                            <div className="space-y-3">
-                                {[
-                                    {
-                                        type: "Economy",
-                                        price: "$12.50",
-                                        time: "5 min away",
-                                        description: "Affordable rides for everyday use",
-                                    },
-                                    {
-                                        type: "Comfort",
-                                        price: "$18.75",
-                                        time: "3 min away",
-                                        description: "More space and comfort for your journey",
-                                    },
-                                    {
-                                        type: "Premium",
-                                        price: "$25.00",
-                                        time: "7 min away",
-                                        description: "Luxury vehicles with top-rated drivers",
-                                    },
-                                ].map((vehicle, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center gap-4 p-4 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
-                                        onClick={() => {
-                                            control.setValue("vehicleType", vehicle.type.toLowerCase())
-                                            setStep("payment")
-                                        }}
-                                    >
-                                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <Car className="h-6 w-6 text-blue-700" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between">
-                                                <p className="font-medium">{vehicle.type}</p>
-                                                <p className="font-medium">{vehicle.price}</p>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <p className="text-sm text-muted-foreground">{vehicle.description}</p>
-                                                <p className="text-sm text-muted-foreground">{vehicle.time}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {step === "payment" && (
-                        <div className="space-y-4">
-                            <div className="flex items-center">
-                                <Button variant="ghost" size="icon" onClick={() => setStep("vehicle")} className="mr-2">
-                                    <ChevronLeft className="h-5 w-5" />
-                                </Button>
-                                <h2 className="text-xl font-bold">Payment Method</h2>
-                            </div>
-
-                            <div className="space-y-3">
-                                {[
-                                    { method: "Credit Card", number: "**** **** **** 4242", default: true },
-                                    { method: "PayPal", number: "john.doe@example.com", default: false },
-                                ].map((payment, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center gap-4 p-4 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
-                                        onClick={() => setStep("confirmation")}
-                                    >
-                                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                            <CreditCard className="h-6 w-6 text-blue-700" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between">
-                                                <p className="font-medium">{payment.method}</p>
-                                                {payment.default && (
-                                                    <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded-full">
-                                                        Default
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-sm text-muted-foreground">{payment.number}</p>
-                                        </div>
-                                    </div>
-                                ))}
-
-                                <Button variant="outline" className="w-full">
-                                    Add Payment Method
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    {step === "confirmation" && (
-                        <div className="space-y-4">
-                            <div className="flex items-center">
-                                <Button variant="ghost" size="icon" onClick={() => setStep("payment")} className="mr-2">
-                                    <ChevronLeft className="h-5 w-5" />
-                                </Button>
-                                <h2 className="text-xl font-bold">Confirm Ride</h2>
-                            </div>
-
-                            <Card>
-                                <CardContent className="pt-6 space-y-4">
-                                    <div className="flex justify-between">
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Pickup</p>
-                                            <p className="font-medium">{ride?.pickUpLocation?.name}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-muted-foreground">Destination</p>
-                                            <p className="font-medium">{ride?.dropOffLocation?.name}</p>
-                                        </div>
-                                    </div>
-
-                                    <Separator />
-
-                                    <div className="flex justify-between">
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Vehicle</p>
-                                            <p className="font-medium">Comfort</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-muted-foreground">Estimated Time</p>
-                                            <p className="font-medium">3 min away</p>
-                                        </div>
-                                    </div>
-
-                                    <Separator />
-
-                                    <div className="flex justify-between">
-                                        <div>
-                                            <p className="text-sm text-muted-foreground">Payment</p>
-                                            <p className="font-medium">Credit Card (*4242)</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm text-muted-foreground">Estimated Price</p>
-                                            <p className="font-medium">
-                                                {routeInfo?.distance ? `${((routeInfo.distance / 1000) * 1.5).toFixed(2)}` : "$18.75"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="flex-col space-y-2">
-                                    <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={handleRequestRide}>
-                                        Confirm Ride
+                    {
+                        step === "vehicle" && (
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    <Button variant="ghost" size="icon" onClick={() => setStep("location")} className="mr-2">
+                                        <ChevronLeft className="h-5 w-5" />
                                     </Button>
-                                    <Button variant="outline" className="w-full" onClick={() => setStep("location")}>
-                                        Edit Request
+                                    <h2 className="text-xl font-bold">Choose Vehicle Type</h2>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {[
+                                        {
+                                            type: "Economy",
+                                            price: "$12.50",
+                                            time: "5 min away",
+                                            description: "Affordable rides for everyday use",
+                                        },
+                                        {
+                                            type: "Comfort",
+                                            price: "$18.75",
+                                            time: "3 min away",
+                                            description: "More space and comfort for your journey",
+                                        },
+                                        {
+                                            type: "Premium",
+                                            price: "$25.00",
+                                            time: "7 min away",
+                                            description: "Luxury vehicles with top-rated drivers",
+                                        },
+                                    ].map((vehicle, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-4 p-4 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
+                                            onClick={() => {
+                                                control.setValue("vehicleType", vehicle.type.toLowerCase())
+                                                setStep("payment")
+                                            }}
+                                        >
+                                            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <Car className="h-6 w-6 text-blue-700" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between">
+                                                    <p className="font-medium">{vehicle.type}</p>
+                                                    <p className="font-medium">{vehicle.price}</p>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <p className="text-sm text-muted-foreground">{vehicle.description}</p>
+                                                    <p className="text-sm text-muted-foreground">{vehicle.time}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    }
+
+                    {
+                        step === "payment" && (
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    <Button variant="ghost" size="icon" onClick={() => setStep("vehicle")} className="mr-2">
+                                        <ChevronLeft className="h-5 w-5" />
                                     </Button>
-                                </CardFooter>
-                            </Card>
-                        </div>
-                    )}
-                </div>
+                                    <h2 className="text-xl font-bold">Payment Method</h2>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {[
+                                        { method: "Credit Card", number: "**** **** **** 4242", default: true },
+                                        { method: "PayPal", number: "john.doe@example.com", default: false },
+                                    ].map((payment, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-4 p-4 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
+                                            onClick={() => setStep("confirmation")}
+                                        >
+                                            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <CreditCard className="h-6 w-6 text-blue-700" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between">
+                                                    <p className="font-medium">{payment.method}</p>
+                                                    {payment.default && (
+                                                        <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                                                            Default
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-sm text-muted-foreground">{payment.number}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    <Button variant="outline" className="w-full">
+                                        Add Payment Method
+                                    </Button>
+                                </div>
+                            </div>
+                        )
+                    }
+
+                    {
+                        step === "confirmation" && (
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    <Button variant="ghost" size="icon" onClick={() => setStep("payment")} className="mr-2">
+                                        <ChevronLeft className="h-5 w-5" />
+                                    </Button>
+                                    <h2 className="text-xl font-bold">Confirm Ride</h2>
+                                </div>
+
+                                <Card>
+                                    <CardContent className="pt-6 space-y-4">
+                                        <div className="flex justify-between">
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Pickup</p>
+                                                <p className="font-medium">{ride?.pickUpLocation?.name}</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-muted-foreground">Destination</p>
+                                                <p className="font-medium">{ride?.dropOffLocation?.name}</p>
+                                            </div>
+                                        </div>
+
+                                        <Separator />
+
+                                        <div className="flex justify-between">
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Vehicle</p>
+                                                <p className="font-medium">Comfort</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-muted-foreground">Estimated Time</p>
+                                                <p className="font-medium">3 min away</p>
+                                            </div>
+                                        </div>
+
+                                        <Separator />
+
+                                        <div className="flex justify-between">
+                                            <div>
+                                                <p className="text-sm text-muted-foreground">Payment</p>
+                                                <p className="font-medium">Credit Card (*4242)</p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-muted-foreground">Estimated Price</p>
+                                                <p className="font-medium">
+                                                    {routeInfo?.distance ? `${((routeInfo.distance / 1000) * 1.5).toFixed(2)}` : "$18.75"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter className="flex-col space-y-2">
+                                        <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={handleRequestRide}>
+                                            Confirm Ride
+                                        </Button>
+                                        <Button variant="outline" className="w-full" onClick={() => setStep("location")}>
+                                            Edit Request
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            </div>
+                        )
+                    }
+                </div >
             ) : // Check if ride is completed
                 ride?.RideStatus === "completed" ? (
                     renderCompletedRide()
@@ -891,6 +1109,6 @@ export default function RideRequestPanel({
                         </Card>
                     </div>
                 )}
-        </div>
+        </div >
     )
 }

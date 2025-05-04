@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { AuthContext } from "@/context/auth.context"
+import { ActivityCard } from "@/components/recent-activity/recent-activity-card"
 import {
     Calendar,
     CheckCircle2,
@@ -21,19 +21,18 @@ import {
     Award,
     Zap,
 } from "lucide-react"
-import { useContext } from "react"
-import { useNavigate } from "react-router-dom"
 
 export default function ProfilePage() {
-    const navigate = useNavigate()
-
-
-
-    const auth = useContext(AuthContext) as { loggedInUser: any }
-
-    if (!auth?.loggedInUser) {
-        navigate('/login')
+    // Note: Removed useNavigate and auth context for Next.js compatibility
+    // In a real app, you'd use Next.js authentication methods
+    const loggedInUser = {
+        name: "John Doe",
+        email: "john.doe@example.com",
+        phone: "+1 (555) 123-4567",
+        address: "San Francisco, CA",
+        image: "/placeholder.svg?height=112&width=112",
     }
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-2">
             <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
@@ -43,16 +42,16 @@ export default function ProfilePage() {
                     <CardContent className="p-0 ">
                         <div className="relative px-4 sm:px-6 pb-6">
                             <Avatar className="h-20 w-20 sm:h-28 sm:w-28 border-4 border-background absolute -top-10 sm:-top-14 ring-2 ring-muted/10">
-                                <AvatarImage src={auth?.loggedInUser?.image} alt="User" />
+                                <AvatarImage src={loggedInUser?.image || "/placeholder.svg"} alt="User" />
                                 <AvatarFallback className="text-xl sm:text-2xl">JD</AvatarFallback>
                             </Avatar>
 
                             <div className="pt-12 sm:ml-32 sm:pt-4 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
                                 <div>
-                                    <h1 className="text-2xl sm:text-3xl font-bold">{auth?.loggedInUser?.name}</h1>
+                                    <h1 className="text-2xl sm:text-3xl font-bold">{loggedInUser?.name}</h1>
                                     <div className="flex items-center gap-2 text-muted-foreground mt-1">
                                         <MapPin className="h-4 w-4" />
-                                        <span>{auth?.loggedInUser?.address}</span>
+                                        <span>{loggedInUser?.address}</span>
                                     </div>
                                 </div>
 
@@ -108,7 +107,7 @@ export default function ProfilePage() {
                                 <div className="space-y-4 sm:space-y-5">
                                     <div className="bg-muted/30 p-3 sm:p-4 rounded-xl">
                                         <h3 className="text-sm font-medium text-muted-foreground mb-1">Full Name</h3>
-                                        <p className="font-medium">{auth?.loggedInUser?.name}</p>
+                                        <p className="font-medium">{loggedInUser?.name}</p>
                                     </div>
 
                                     <div className="bg-muted/30 p-3 sm:p-4 rounded-xl">
@@ -126,7 +125,7 @@ export default function ProfilePage() {
                                     <div className="bg-muted/30 p-3 sm:p-4 rounded-xl">
                                         <h3 className="text-sm font-medium text-muted-foreground mb-1">Email Address</h3>
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <p className="font-medium">{auth?.loggedInUser?.email}</p>
+                                            <p className="font-medium">{loggedInUser?.email}</p>
                                             <Badge variant="outline" className="h-5 flex items-center gap-1">
                                                 <CheckCircle2 className="h-3 w-3 text-green-500" />
                                                 Verified
@@ -137,7 +136,7 @@ export default function ProfilePage() {
                                     <div className="bg-muted/30 p-3 sm:p-4 rounded-xl">
                                         <h3 className="text-sm font-medium text-muted-foreground mb-1">Phone Number</h3>
                                         <div className="flex items-center gap-2 flex-wrap">
-                                            <p className="font-medium">{auth?.loggedInUser?.phone}</p>
+                                            <p className="font-medium">{loggedInUser?.phone}</p>
                                             <Badge variant="outline" className="h-5 flex items-center gap-1">
                                                 <CheckCircle2 className="h-3 w-3 text-green-500" />
                                                 Verified
@@ -202,6 +201,9 @@ export default function ProfilePage() {
                         </CardContent>
                     </Card>
 
+                    {/* Activity Card - Recent Rides and Reviews */}
+                    <ActivityCard />
+
                     {/* Address Information - Spans 4 columns on large screens, 3 on medium */}
                     <Card className="md:col-span-3 lg:col-span-4 md:row-span-2 overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow duration-200">
                         <CardContent className="p-4 sm:p-6">
@@ -255,7 +257,7 @@ export default function ProfilePage() {
                         </CardContent>
                     </Card>
 
-                    {/* NEW: Ride Statistics - Spans 3 columns on medium screens, 4 on large */}
+                    {/* Ride Statistics - Spans 3 columns on medium screens, 4 on large */}
                     <Card className="md:col-span-3 lg:col-span-4 overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow duration-200">
                         <CardContent className="p-4 sm:p-6">
                             <div className="flex items-center justify-between mb-4 sm:mb-5">

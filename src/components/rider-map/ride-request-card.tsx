@@ -1,4 +1,4 @@
-
+"use client"
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -86,14 +86,16 @@ export default function RideRequestCard({
     onComplete,
     onCancel,
 }: RideRequestCardProps) {
-
-    const { hasAcceptedRide, setHasAcceptedRide } = useContext(RideContext) as { hasAcceptedRide: boolean, setHasAcceptedRide: (value: boolean) => void }
-
+    const { hasAcceptedRide, setHasAcceptedRide } = useContext(RideContext) as {
+        hasAcceptedRide: boolean
+        setHasAcceptedRide: (value: boolean) => void
+    }
 
     const [accepting, setAccepting] = useState(false)
     const [ride, setRide] = useState<RideData>()
     const [cancelling, setCancelling] = useState(false)
     const [endButton, setEndButton] = useState(false)
+    const [showCompletedView, setShowCompletedView] = useState(false)
     // First, let's add a state to track if a ride has been accepted
     // const [hasAcceptedRide, setHasAcceptedRide] = useState(false)
     const [navigating, setNavigating] = useState(false)
@@ -104,6 +106,11 @@ export default function RideRequestCard({
         if (request.RideStatus === "accepted" || ride) {
             setHasAcceptedRide(true)
             onAccept(request._id)
+        }
+
+        // Check if ride is already completed
+        if (request.RideStatus === "completed" || (ride && ride.RideStatus === "completed")) {
+            setShowCompletedView(true)
         }
     }, [])
 
@@ -131,28 +138,28 @@ export default function RideRequestCard({
         try {
             const response = await mapsSvc.updateRide({ rideId, status: "ongoing", RideStatus: "ongoing" })
             console.log(response.detail)
-            if (response?.detail?.RideStatus === 'ongoing') {
+            if (response?.detail?.RideStatus === "ongoing") {
                 setEndButton(true)
-
             }
-
-
         } catch (exception) {
             console.log(exception)
         }
     }
-    const endRide = async (rideId: string) => {
+    async function endRide(rideId: string) {
         try {
-
-            const response = await mapsSvc.updateRide({ rideId, status: 'completed', RideStatus: 'completed' })
+            const response = await mapsSvc.updateRide({ rideId, status: "completed", RideStatus: "completed" })
             console.log(response.detail)
 
+            if (response?.detail?.RideStatus === "completed") {
+                // Set ride status to completed in local state
+                if (ride) {
+                    setRide({ ...ride, RideStatus: "completed" })
+                }
+            }
         } catch (exception) {
             console.log(exception)
         }
     }
-
-
 
     // Replace the entire return statement with this updated version that separates the cards
     return (
@@ -261,9 +268,7 @@ export default function RideRequestCard({
                         {request.RideStatus === "ongoing" && (
                             <>
                                 <Button className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => onNavigate(request._id)}>
-                                    {
-                                        endButton ? 'End Ride' : "Begin Ride"
-                                    }
+                                    {endButton ? "End Ride" : "Begin Ride"}
                                 </Button>
                                 <Button
                                     variant="success"
@@ -285,7 +290,7 @@ export default function RideRequestCard({
             )}
 
             {/* Show the accepted ride card if we have an accepted ride */}
-            {hasAcceptedRide && ride && (
+            {hasAcceptedRide && ride && ride.RideStatus !== "completed" && (
                 <div className="space-y-6">
                     <div className="text-center space-y-2">
                         <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto">
@@ -317,9 +322,7 @@ export default function RideRequestCard({
                                     <div className="flex items-center">
                                         <p className="text-sm text-muted-foreground">4.9 ★</p>
                                         <span className="mx-1">•</span>
-                                        <p className="text-sm text-muted-foreground">
-                                            {/* {ride?.userId?.email} */}
-                                        </p>
+                                        <p className="text-sm text-muted-foreground">{/* {ride?.userId?.email} */}</p>
                                     </div>
                                 </div>
                             </div>
@@ -398,7 +401,7 @@ export default function RideRequestCard({
                             <div className="flex justify-between">
                                 <div>
                                     <p className="text-sm text-muted-foreground">Payment Status</p>
-                                    <p className="font-medium capitalize">{ride?.paymentStatus || "Unpaid"}</p>
+                                    <p className="font-medium capitalize">{ride?.paymentStatus || "Paid"}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-sm text-muted-foreground">Payment Method</p>
@@ -411,16 +414,14 @@ export default function RideRequestCard({
                                 <Button
                                     className="flex-1 bg-blue-600 hover:bg-blue-700 mr-2"
                                     onClick={() => {
-                                        onNavigate(ride._id);
+                                        onNavigate(ride._id)
 
                                         setTimeout(() => {
-                                            setNavigating(true);
-                                        }, 1500);
+                                            setNavigating(true)
+                                        }, 1500)
                                     }}
                                 >
-                                    {
-                                        navigating ? "Navigating..." : "Navigate to Pickup"
-                                    }
+                                    {navigating ? "Navigating..." : "Navigate to Pickup"}
                                 </Button>
                             )}
 
@@ -436,14 +437,114 @@ export default function RideRequestCard({
                                 </Button>
                             )}
 
-                            <Button variant="destructive" className="flex-1 " disabled={cancelling} onClick={() => onCancel(ride._id)}>
+                            <Button
+                                variant="destructive"
+                                className="flex-1 "
+                                disabled={cancelling}
+                                onClick={() => onCancel(ride._id)}
+                            >
                                 {cancelling ? "Cancelling..." : "Cancel Ride"}
                             </Button>
                         </CardFooter>
                     </Card>
-                </div >
-            )
-            }
+                </div>
+            )}
+            {/* Show the completed ride view when a ride is completed */}
+            {hasAcceptedRide && ride && ride.RideStatus === "completed" && (
+                <div className="space-y-6">
+                    <div className="text-center space-y-2">
+                        <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-8 w-8 text-green-700"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <h2 className="text-xl font-bold">Ride Completed!</h2>
+                        <p className="text-muted-foreground">The ride has been successfully completed</p>
+                    </div>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Ride Summary</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                    {ride?.userId?.image ? (
+                                        <img
+                                            src={ride.userId.image || "/placeholder.svg"}
+                                            className="h-11 w-11 rounded-full object-contain"
+                                            alt="Passenger"
+                                        />
+                                    ) : (
+                                        <User className="h-6 w-6 text-blue-700" />
+                                    )}
+                                </div>
+                                <div>
+                                    <p className="font-medium">{ride?.userId?.name}</p>
+                                    <div className="flex items-center">
+                                        <p className="text-sm text-muted-foreground">4.9 ★</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Distance</p>
+                                    <p className="font-medium">{ride?.distance?.toFixed(1)} km</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Duration</p>
+                                    <p className="font-medium">{ride?.distanceTime?.toFixed(1)} min</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Fare</p>
+                                    <p className="font-medium">NRs {ride?.fare?.toFixed(2)}</p>
+                                </div>
+                            </div>
+
+                            <Separator />
+
+                            <div className="flex justify-between">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Payment Status</p>
+                                    <p className="font-medium capitalize">{ride?.paymentStatus || "Unpaid"}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-sm text-muted-foreground">Payment Method</p>
+                                    <p className="font-medium">Cash</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                        <CardFooter className="flex justify-between">
+                            <Button
+                                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                                onClick={() => {
+                                    // Reset states to look for new rides
+                                    setHasAcceptedRide(false)
+                                    setNavigating(false)
+                                    setEndButton(false)
+                                    setShowCompletedView(false)
+                                    setRide(undefined)
+                                }}
+                            >
+                                Find New Rides
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                </div>
+            )}
         </>
     )
 }

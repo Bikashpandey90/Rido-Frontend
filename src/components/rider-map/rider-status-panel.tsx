@@ -158,7 +158,6 @@ export default function RiderStatusPanel({
                             onClick={
                                 () => {
                                     updateStatus(true)
-
                                 }
                             }>
                             Go Online
