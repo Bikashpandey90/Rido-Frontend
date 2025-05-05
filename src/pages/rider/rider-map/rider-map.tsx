@@ -2,7 +2,7 @@
 import { useState, useEffect, useContext } from "react"
 import { NavLink } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, Menu, Navigation } from "lucide-react"
+import { ChevronLeft, Navigation } from "lucide-react"
 import RiderMapView from "@/components/rider-map/rider-map-view"
 import RiderStatusPanel from "@/components/rider-map/rider-status-panel"
 import riderMapService from "./rider-map-service"
@@ -11,7 +11,6 @@ import { RideContext } from "@/context/ride.context"
 export default function RiderPage() {
 
     const { hasAcceptedRide } = useContext(RideContext) as { hasAcceptedRide: boolean }
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isOnline, setIsOnline] = useState(false)
     const [routeInfo, setRouteInfo] = useState<any>(null)
     const [showRoute, setShowRoute] = useState(false)
@@ -220,24 +219,22 @@ export default function RiderPage() {
                     <ChevronLeft className="h-5 w-5" />
                     <span>Back</span>
                 </NavLink>
-                <div className="font-bold text-lg">Driver Dashboard</div>
+                {/* <div className="font-bold text-lg">Driver Dashboard</div>
                 <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                     <Menu className="h-5 w-5" />
-                </Button>
+                </Button> */}
             </div>
 
             {/* Mobile sidebar */}
-            {isSidebarOpen && (
+            {/* {isSidebarOpen && (
                 <div className="md:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
                     <div className="fixed inset-y-0 right-0 w-3/4 max-w-xs bg-background p-6 shadow-lg">
-                        {/* Sidebar content */}
                         <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}>
                             <ChevronLeft className="h-5 w-5" />
                         </Button>
-                        {/* Navigation links would go here */}
                     </div>
                 </div>
-            )}
+            )} */}
 
             <div className="flex flex-1 flex-col md:flex-row">
                 {/* Map area */}

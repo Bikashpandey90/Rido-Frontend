@@ -28,3 +28,26 @@ export function getCookie(cname: string) {
   }
   return "";
 }
+
+export function datify(date: Date) {
+  const year = date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+  return year
+
+}
+export function timefy(date: Date) {
+  const time = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: true })
+  return time
+}
+
+export function shortify(address: string, len: number = 2) {
+  const Address = address.split(',').slice(0, len).join(' ')
+  return Address
+}
+export function initialify(name: string) {
+  return name
+    ?.split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .toUpperCase()
+
+}

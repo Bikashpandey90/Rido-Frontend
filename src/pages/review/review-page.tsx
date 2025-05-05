@@ -9,17 +9,28 @@ import reviewSvc from "./review.svc"
 import { useEffect, useState } from "react"
 
 export interface Review {
-    _id: String,
-    user: String,
-    rider: String,
-    rating: Number,
-    comment: String,
-    ride: String,
+    _id: string,
+    user: string,
+    rider: {
+        name: string,
+        image: string
+    },
+    rating: number,
+    comment: string,
+    ride: {
+        pickUpLocation: {
+            name: string
+        },
+        dropOffLocation: {
+            name: string
+        }
+    },
+    createdAt: string
 
 }
 export default function ReviewsPage() {
 
-    const [reviews, setReviews] = useState([])
+    const [reviews, setReviews] = useState<Review[]>([])
 
     const fetchReviews = async () => {
         try {
@@ -51,7 +62,7 @@ export default function ReviewsPage() {
                 </div>
 
                 {/* Reviews from Drivers */}
-                <Card className="border-none shadow-md">
+                {/* <Card className="border-none shadow-md">
                     <CardHeader className="pb-2 px-3 sm:px-6 pt-4">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <CardTitle className="text-lg">Reviews from Drivers</CardTitle>
@@ -63,7 +74,8 @@ export default function ReviewsPage() {
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-4 px-3 sm:px-6 pb-4 sm:pb-6">
-                        {/* Review 1 */}
+                       
+
                         <div className="bg-gradient-to-r from-yellow-50 to-amber-50 p-3 sm:p-4 rounded-xl border border-yellow-100">
                             <div className="flex flex-col sm:flex-row justify-between gap-2">
                                 <div className="flex items-start gap-2 sm:gap-3">
@@ -126,7 +138,7 @@ export default function ReviewsPage() {
                             </div>
                         </div>
 
-                        {/* Review 2 */}
+                    
                         <div className="bg-muted/30 p-3 sm:p-4 rounded-xl border border-muted">
                             <div className="flex flex-col sm:flex-row justify-between gap-2">
                                 <div className="flex items-start gap-2 sm:gap-3">
@@ -188,7 +200,7 @@ export default function ReviewsPage() {
                             </div>
                         </div>
                     </CardContent>
-                </Card>
+                </Card> */}
 
                 <Separator />
 
@@ -199,123 +211,71 @@ export default function ReviewsPage() {
                     </CardHeader>
                     <CardContent className="space-y-4 px-3 sm:px-6 pb-4 sm:pb-6">
                         {/* Review 1 */}
-                        <div className="bg-muted/30 p-3 sm:p-4 rounded-xl border border-muted">
-                            <div className="flex flex-col sm:flex-row justify-between gap-2">
-                                <div className="flex items-start gap-2 sm:gap-3">
-                                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
-                                        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Driver" />
-                                        <AvatarFallback>MK</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <div className="flex items-center flex-wrap gap-2">
-                                            <h3 className="font-medium text-sm sm:text-base">Michael K.</h3>
-                                            <Badge variant="outline" className="text-xs h-5">
-                                                Driver
-                                            </Badge>
-                                        </div>
-                                        <div className="flex flex-wrap items-center gap-1">
-                                            <div className="flex">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-yellow-400 text-yellow-400" />
-                                                ))}
+                        {
+                            reviews.map((review, index) => (
+                                <div className="bg-muted/30 p-3 sm:p-4 rounded-xl border border-muted" key={index}>
+                                    <div className="flex flex-col sm:flex-row justify-between gap-2">
+                                        <div className="flex items-start gap-2 sm:gap-3">
+                                            <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
+                                                <AvatarImage src={review?.rider?.image} alt="Driver" />
+                                                <AvatarFallback>MK</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <div className="flex items-center flex-wrap gap-2">
+                                                    <h3 className="font-medium text-sm sm:text-base">{review?.rider?.name}</h3>
+                                                    <Badge variant="outline" className="text-xs h-5">
+                                                        Driver
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex flex-wrap items-center gap-1">
+                                                    <div className="flex">
+                                                        {[...Array(review?.rating)].map((_, i) => (
+                                                            <Star key={i} className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-yellow-400 text-yellow-400" />
+                                                        ))}
+                                                        {[...Array(5 - +review?.rating)].map((_, i) => (
+                                                            <Star key={i} className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-muted stroke-muted-foreground" />
+                                                        ))}
+                                                    </div>
+                                                    <span className="text-xs ml-1 text-muted-foreground">
+                                                        <Calendar className="h-2.5 w-2.5 sm:h-3 sm:w-3 inline mr-1" />
+                                                        May 2, 2025
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <span className="text-xs ml-1 text-muted-foreground">
-                                                <Calendar className="h-2.5 w-2.5 sm:h-3 sm:w-3 inline mr-1" />
-                                                May 2, 2025
-                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-muted-foreground mt-1 sm:mt-0">
+                                            <span className="text-xs">{review?.ride?.pickUpLocation?.name.split(" ").slice(0, 2).join(" ")}{' '} to{' '}{review?.ride?.dropOffLocation?.name.split(" ").slice(0, 2).join(" ")} </span>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-1 text-muted-foreground mt-1 sm:mt-0">
-                                    <span className="text-xs">Downtown to Airport</span>
-                                </div>
-                            </div>
 
-                            <div className="mt-3 sm:pl-13">
-                                <p className="italic text-xs sm:text-sm">"Great driver, very professional and on time!"</p>
+                                    <div className="mt-3 sm:pl-13">
+                                        <p className="italic text-xs sm:text-sm">"{review?.comment}!"</p>
 
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3 sm:mt-4">
-                                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                                        <div className="flex items-center gap-1">
-                                            <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
-                                            <span className="text-xs sm:text-sm">Professional</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
-                                            <span className="text-xs sm:text-sm">On time</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
-                                            <span className="text-xs sm:text-sm">Clean car</span>
-                                        </div>
-                                    </div>
-                                    <Button size="sm" variant="outline" className="text-xs h-8 w-full sm:w-auto">
-                                        <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
-                                        Edit
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Review 2 */}
-                        <div className="bg-muted/30 p-3 sm:p-4 rounded-xl border border-muted">
-                            <div className="flex flex-col sm:flex-row justify-between gap-2">
-                                <div className="flex items-start gap-2 sm:gap-3">
-                                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 shrink-0">
-                                        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Driver" />
-                                        <AvatarFallback>SL</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <div className="flex items-center flex-wrap gap-2">
-                                            <h3 className="font-medium text-sm sm:text-base">Sarah L.</h3>
-                                            <Badge variant="outline" className="text-xs h-5">
-                                                Driver
-                                            </Badge>
-                                        </div>
-                                        <div className="flex flex-wrap items-center gap-1">
-                                            <div className="flex">
-                                                {[...Array(4)].map((_, i) => (
-                                                    <Star key={i} className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-yellow-400 text-yellow-400" />
-                                                ))}
-                                                <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-muted stroke-muted-foreground" />
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3 sm:mt-4">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+                                                <div className="flex items-center gap-1">
+                                                    <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
+                                                    <span className="text-xs sm:text-sm">Professional</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
+                                                    <span className="text-xs sm:text-sm">On time</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
+                                                    <span className="text-xs sm:text-sm">Clean car</span>
+                                                </div>
                                             </div>
-                                            <span className="text-xs ml-1 text-muted-foreground">
-                                                <Calendar className="h-2.5 w-2.5 sm:h-3 sm:w-3 inline mr-1" />
-                                                April 30, 2025
-                                            </span>
+                                            <Button size="sm" variant="outline" className="text-xs h-8 w-full sm:w-auto">
+                                                <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
+                                                Edit
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1 text-muted-foreground mt-1 sm:mt-0">
-                                    <span className="text-xs">Home to Office</span>
-                                </div>
-                            </div>
+                            ))
+                        }
 
-                            <div className="mt-3 sm:pl-13">
-                                <p className="italic text-xs sm:text-sm">"Clean car and smooth ride. Would recommend!"</p>
-
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-3 sm:mt-4">
-                                    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-                                        <div className="flex items-center gap-1">
-                                            <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
-                                            <span className="text-xs sm:text-sm">Clean</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <ThumbsUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
-                                            <span className="text-xs sm:text-sm">Smooth</span>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            <ThumbsDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
-                                            <span className="text-xs sm:text-sm">Late</span>
-                                        </div>
-                                    </div>
-                                    <Button size="sm" variant="outline" className="text-xs h-8 w-full sm:w-auto">
-                                        <MessageSquare className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
-                                        Edit
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
                     </CardContent>
                 </Card>
             </div>

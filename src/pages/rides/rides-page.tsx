@@ -3,22 +3,74 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { ArrowLeft, Calendar, Car, Clock, CreditCard, MapPin, Star } from "lucide-react"
-import { useState } from "react"
+import { ArrowLeft, Bike, Calendar, Car, Clock, CreditCard, MapPin, Star } from "lucide-react"
+import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
+import rideSvc from "./rides.service"
+import { datify, initialify, timefy } from "@/lib/utils"
+
+interface Location {
+    type: "Point";
+    coordinates: [number, number]; // [longitude, latitude]
+    name: string;
+}
+
+interface VehicleDetails {
+    vehicleType: string;
+    model: string;
+    plateNumber: string;
+}
+
+interface Rider {
+    _id: string;
+    name: string;
+    email: string;
+    image: string;
+}
+
+export interface RideData {
+    pickUpLocation: Location;
+    dropOffLocation: Location;
+    vehicleDetails: VehicleDetails;
+    _id: string;
+    userId: string;
+    fare: number;
+    distance: number;
+    distanceTime: number;
+    RideStatus: "completed" | "ongoing" | "cancelled" | string;
+    paymentStatus: "paid" | "unpaid" | string;
+    isPaid: boolean;
+    vehicleType: string;
+    isScheduled: boolean;
+    status: "completed" | "pending" | "cancelled" | string;
+    createdBy: string | null;
+    updatedBy: string | null;
+    createdAt: string; // ISO Date string
+    updatedAt: string; // ISO Date string
+    __v: number;
+    rider: Rider;
+}
+
 
 export default function RidesPage() {
-    const [rides, setRides] = useState([])
+    const [rides, setRides] = useState<RideData[]>([])
 
     const fetchRides = async () => {
         try {
-            
+
+            const response = await rideSvc.getRides()
+            setRides(response.detail)
+
 
         } catch (exception) {
             console.log(exception)
         }
 
     }
+    useEffect(() => {
+        fetchRides()
+
+    }, [])
 
 
     return (
@@ -86,7 +138,7 @@ export default function RidesPage() {
                     <CardHeader className="pb-2 px-3 sm:px-6 pt-4">
                         <div className="flex justify-between items-center">
                             <CardTitle className="text-lg">Recent Rides</CardTitle>
-                            <span className="text-sm text-muted-foreground">3 rides</span>
+                            <span className="text-sm text-muted-foreground">{rides.length} rides</span>
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-4 px-3 sm:px-6 pb-4 sm:pb-6">
@@ -173,156 +225,89 @@ export default function RidesPage() {
                         </div>
 
                         {/* Ride 2 */}
-                        <div className="bg-muted/30 p-3 sm:p-4 rounded-xl border border-muted">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                <div className="flex items-center gap-2 sm:gap-3">
-                                    <div className="bg-muted/50 p-1.5 sm:p-2 rounded-full">
-                                        <Car className="h-4 w-4 sm:h-5 sm:w-5" />
+                        {
+                            rides.map((ride, index) => (
+                                <div className="bg-muted/30 p-3 sm:p-4 rounded-xl border border-muted" key={index}>
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+                                        <div className="flex items-center gap-2 sm:gap-3">
+                                            <div className="bg-muted/50 p-1.5 sm:p-2 rounded-full">
+                                                {
+                                                    ride.vehicleType === 'car' ? <Car className="h-4 w-4 sm:h-5 sm:w-5" /> : <Bike className="h-4 w-4 sm:h-5 sm:w-5" />
+                                                }
+                                            </div>
+                                            <div>
+                                                <h3 className="font-medium text-sm sm:text-base">Home to Office</h3>
+                                                <div className="flex flex-wrap items-center text-xs sm:text-sm text-muted-foreground gap-1 sm:gap-0">
+                                                    <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
+                                                    {/* <span>{new Date(ride?.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span> */}
+                                                    <span> {datify(new Date(ride?.createdAt))}</span>
+                                                    <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 ml-2 mr-1" />
+                                                    <span>{timefy(new Date(ride?.createdAt))}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Badge variant="outline" className="text-xs w-fit">
+                                            Completed
+                                        </Badge>
                                     </div>
-                                    <div>
-                                        <h3 className="font-medium text-sm sm:text-base">Home to Office</h3>
-                                        <div className="flex flex-wrap items-center text-xs sm:text-sm text-muted-foreground gap-1 sm:gap-0">
-                                            <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
-                                            <span>April 30, 2025</span>
-                                            <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 ml-2 mr-1" />
-                                            <span>8:15 AM</span>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 sm:mt-4">
+                                        <div className="flex flex-col">
+                                            <span className="text-xs text-muted-foreground mb-1">Pickup</span>
+                                            <div className="flex items-start gap-1">
+                                                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mt-0.5 shrink-0" />
+                                                <span className="text-xs sm:text-sm break-words">{ride?.pickUpLocation?.name.split(",").slice(0, 1).join(" ")}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col">
+                                            <span className="text-xs text-muted-foreground mb-1">Dropoff</span>
+                                            <div className="flex items-start gap-1">
+                                                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mt-0.5 shrink-0" />
+                                                <span className="text-xs sm:text-sm break-words">{ride?.dropOffLocation?.name.split(',').slice(0, 1).join(' ')}</span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col">
+                                            <span className="text-xs text-muted-foreground mb-1">Payment</span>
+                                            <div className="flex items-center gap-1 flex-wrap">
+                                                <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                                <span className="text-xs sm:text-sm font-medium">Nrs {ride?.fare}</span>
+                                                <span className="text-xs text-muted-foreground">• Visa •••• 4242</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <Separator className="my-3 sm:my-4" />
+
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                        <div className="flex items-center gap-2">
+                                            <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
+                                                <AvatarImage src={ride?.rider?.image} alt="Driver" />
+                                                <AvatarFallback>{initialify(ride?.rider?.name)}</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <p className="text-xs sm:text-sm font-medium">{ride?.rider?.name}</p>
+                                                <div className="flex items-center">
+                                                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                                    <span className="text-xs ml-1">5.0</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 w-full sm:w-auto justify-end">
+                                            <Button size="sm" variant="outline" className="text-xs h-8">
+                                                Receipt
+                                            </Button>
+                                            <Button size="sm" className="text-xs h-8">
+                                                Book Again
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
-                                <Badge variant="outline" className="text-xs w-fit">
-                                    Completed
-                                </Badge>
-                            </div>
+                            ))
+                        }
 
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 sm:mt-4">
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-muted-foreground mb-1">Pickup</span>
-                                    <div className="flex items-start gap-1">
-                                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mt-0.5 shrink-0" />
-                                        <span className="text-xs sm:text-sm break-words">123 Main Street, San Francisco, CA 94105</span>
-                                    </div>
-                                </div>
 
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-muted-foreground mb-1">Dropoff</span>
-                                    <div className="flex items-start gap-1">
-                                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mt-0.5 shrink-0" />
-                                        <span className="text-xs sm:text-sm break-words">456 Market Street, San Francisco, CA 94103</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-muted-foreground mb-1">Payment</span>
-                                    <div className="flex items-center gap-1 flex-wrap">
-                                        <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                        <span className="text-xs sm:text-sm font-medium">$18.75</span>
-                                        <span className="text-xs text-muted-foreground">• Visa •••• 4242</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <Separator className="my-3 sm:my-4" />
-
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div className="flex items-center gap-2">
-                                    <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
-                                        <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Driver" />
-                                        <AvatarFallback>SL</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="text-xs sm:text-sm font-medium">Sarah L.</p>
-                                        <div className="flex items-center">
-                                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                            <span className="text-xs ml-1">5.0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2 w-full sm:w-auto justify-end">
-                                    <Button size="sm" variant="outline" className="text-xs h-8">
-                                        Receipt
-                                    </Button>
-                                    <Button size="sm" className="text-xs h-8">
-                                        Book Again
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Ride 3 */}
-                        <div className="bg-muted/30 p-3 sm:p-4 rounded-xl border border-muted">
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-                                <div className="flex items-center gap-2 sm:gap-3">
-                                    <div className="bg-muted/50 p-1.5 sm:p-2 rounded-full">
-                                        <Car className="h-4 w-4 sm:h-5 sm:w-5" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-medium text-sm sm:text-base">Office to Restaurant</h3>
-                                        <div className="flex flex-wrap items-center text-xs sm:text-sm text-muted-foreground gap-1 sm:gap-0">
-                                            <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
-                                            <span>April 28, 2025</span>
-                                            <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 ml-2 mr-1" />
-                                            <span>6:45 PM</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <Badge variant="outline" className="text-xs w-fit">
-                                    Completed
-                                </Badge>
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 sm:mt-4">
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-muted-foreground mb-1">Pickup</span>
-                                    <div className="flex items-start gap-1">
-                                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mt-0.5 shrink-0" />
-                                        <span className="text-xs sm:text-sm break-words">456 Market Street, San Francisco, CA 94103</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-muted-foreground mb-1">Dropoff</span>
-                                    <div className="flex items-start gap-1">
-                                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 mt-0.5 shrink-0" />
-                                        <span className="text-xs sm:text-sm break-words">789 Valencia Street, San Francisco, CA 94110</span>
-                                    </div>
-                                </div>
-
-                                <div className="flex flex-col">
-                                    <span className="text-xs text-muted-foreground mb-1">Payment</span>
-                                    <div className="flex items-center gap-1 flex-wrap">
-                                        <CreditCard className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                                        <span className="text-xs sm:text-sm font-medium">$15.25</span>
-                                        <span className="text-xs text-muted-foreground">• Visa •••• 4242</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <Separator className="my-3 sm:my-4" />
-
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <div className="flex items-center gap-2">
-                                    <Avatar className="h-7 w-7 sm:h-8 sm:w-8">
-                                        <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Driver" />
-                                        <AvatarFallback>JR</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="text-xs sm:text-sm font-medium">James R.</p>
-                                        <div className="flex items-center">
-                                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                            <span className="text-xs ml-1">4.8</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex gap-2 w-full sm:w-auto justify-end">
-                                    <Button size="sm" variant="outline" className="text-xs h-8">
-                                        Receipt
-                                    </Button>
-                                    <Button size="sm" className="text-xs h-8">
-                                        Book Again
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
                     </CardContent>
                 </Card>
             </div>

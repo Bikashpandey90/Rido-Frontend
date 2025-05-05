@@ -56,8 +56,11 @@ export function UserNav() {
                         Profile
                         <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        Billing
+                    <DropdownMenuItem onClick={() => {
+                        navigate(`/${auth.loggedInUser.role}/chats`)
+
+                    }}>
+                        Chats
                         <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => {

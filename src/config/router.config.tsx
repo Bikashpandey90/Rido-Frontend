@@ -19,6 +19,7 @@ import NewMapPage from "@/pages/customer/map/new-map-check";
 import RiderPage from "@/pages/rider/rider-map/rider-map";
 import ReviewsPage from "@/pages/review/review-page";
 import RidesPage from "@/pages/rides/rides-page";
+import ChatPage from "@/pages/chat/chat-page";
 
 
 
@@ -73,6 +74,9 @@ const Routing: FC = () => {
                 }, {
                     path: '/rides',
                     element: <RidesPage />
+                }, {
+                    path: 'chat',
+                    element: <ChatPage />
                 }
             ]
         }
