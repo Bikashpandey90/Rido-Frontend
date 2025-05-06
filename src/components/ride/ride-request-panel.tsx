@@ -16,6 +16,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import reviewSvc from "@/pages/review/review.svc"
 import { Textarea } from "../ui/textarea"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import MessageBox from "../chat/chatBox"
 
 interface RideRequestPanelProps {
     latitude: number | null
@@ -84,6 +85,8 @@ export default function RideRequestPanel({
     const [reviewComplete, setReviewComplete] = useState(false)
     const [savedLocations, setSavedLocations] = useState<SavedLocations[]>([])
     const [recentLocations, setRecentLocations] = useState<RecentRideLocations[]>([])
+    const [isMessageOpen, setIsMessageOpen] = useState(false)
+
 
     const rideRequestDTO = Yup.object({
         // pickUpLocation: Yup.object({
@@ -313,6 +316,31 @@ export default function RideRequestPanel({
             console.error("Error fetching saved locations:", exception)
         }
     }
+    const deleteSavedLocation = async (id: string) => {
+        try {
+            const response = await mapsSvc.deleteSavedLocationById(id)
+            console.log(response.detail)
+            if (response?.status === 'ADDRESS_DELETED') {
+                getSavedLocations()
+            }
+
+
+        } catch (exception) {
+            console.log(exception)
+        }
+    }
+    const saveLocations = async (data: any) => {
+        try {
+            let payload = {
+
+            }
+            const response = await mapsSvc.saveLocation(payload)
+
+        } catch (exception) {
+            console.log(exception)
+        }
+
+    }
     useEffect(() => {
         getSavedLocations()
         getRecentLocations()
@@ -330,43 +358,6 @@ export default function RideRequestPanel({
                 return <MapPin className="h-4 w-4 text-blue-700" />
         }
     }
-
-    // const submitReview = async () => {
-    //     if (rating === 0) {
-    //         alert("Please select a rating before submitting")
-    //         return
-    //     }
-
-    //     setIsSubmittingReview(true)
-    //     try {
-    //         // Simulate review submission
-    //         await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    //         // Here you would normally call your review API
-    //         // const response = await mapsSvc.submitReview(ride?._id, {
-    //         //   rating,
-    //         //   comment: reviewText
-    //         // });
-
-    //         console.log(`Submitting review for ride ${ride?._id}: ${rating} stars, "${reviewText}"`)
-    //         setReviewComplete(true)
-
-    //         // Reset ride state after review is complete
-    //         setTimeout(() => {
-    //             setIsRideRequested(false)
-    //             setRide(null)
-    //             setPaymentComplete(false)
-    //             setReviewComplete(false)
-    //             setRating(0)
-    //             setReviewText("")
-    //         }, 2000)
-    //     } catch (error) {
-    //         console.error("Review submission error:", error)
-    //         alert("Failed to submit review. Please try again.")
-    //     } finally {
-    //         setIsSubmittingReview(false)
-    //     }
-    // }
 
     // Render stars for rating
     const renderStars = () => {
@@ -567,6 +558,8 @@ export default function RideRequestPanel({
         }
     }
 
+
+
     return (
         <div className="w-full md:w-96 bg-background border-t md:border-t-0 md:border-l md:h-screen md:overflow-y-auto">
             {isWaitingForDriver ? (
@@ -739,7 +732,7 @@ export default function RideRequestPanel({
                                                             <DropdownMenuSeparator />
                                                             <DropdownMenuItem
                                                                 className="text-red-600 dark:text-red-400"
-                                                                onClick={() => { }}
+                                                                onClick={() => { deleteSavedLocation(location._id) }}
                                                             >
                                                                 <Trash className="h-4 w-4 mr-2" />
                                                                 Delete
@@ -792,7 +785,7 @@ export default function RideRequestPanel({
                                                             </Button>
                                                         </DropdownMenuTrigger>
                                                         <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => { }}>
+                                                            <DropdownMenuItem onClick={() => { saveLocations(location) }}>
                                                                 <Check className="h-4 w-4 mr-2" />
                                                                 Save
                                                             </DropdownMenuItem>
@@ -806,6 +799,9 @@ export default function RideRequestPanel({
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
+
+
+
                                                 </div>
                                             ))
                                         ) : (
@@ -1059,11 +1055,20 @@ export default function RideRequestPanel({
                                 >
                                     Call
                                 </Button>
-                                <Button variant="outline" className="flex-1 ml-2">
+                                <Button variant="outline" className="flex-1 ml-2" onClick={() => {
+                                    setIsMessageOpen(!isMessageOpen)
+                                }}>
                                     Message
                                 </Button>
                             </CardFooter>
                         </Card>
+                        {ride && (
+                            <MessageBox
+                                isOpen={isMessageOpen}
+                                onClose={() => setIsMessageOpen(false)}
+                                rider={ride.rider}
+                            />
+                        )}
 
                         <Card>
                             <CardHeader>

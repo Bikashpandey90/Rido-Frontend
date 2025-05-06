@@ -6,7 +6,7 @@ import MessageInput from "./MessageInput";
 import { User } from "../sidebar/sidebar";
 import chatSvc from "@/pages/chat/chat.svc";
 
-interface Message {
+export interface Message {
     _id: string;
     sender: string,
     createdAt: string,

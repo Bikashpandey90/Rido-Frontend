@@ -1,4 +1,3 @@
-"use client"
 
 import { useEffect, useRef, useMemo } from "react"
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet"

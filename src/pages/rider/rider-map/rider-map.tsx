@@ -23,15 +23,7 @@ export default function RiderPage() {
     const [dropoffLatitude, setDropoffLatitude] = useState<number | null>(null)
     const [dropoffLongitude, setDropoffLongitude] = useState<number | null>(null)
 
-    // // Mock data for rider stats
-    // const riderStats = {
-    //     totalRides: 248,
-    //     acceptanceRate: 92,
-    //     averageRating: 4.8,
-    //     totalEarnings: 3842.75,
-    // }
 
-    // Mock data for earnings
     const earnings = {
         today: 85.5,
         week: 425.75,
@@ -219,22 +211,10 @@ export default function RiderPage() {
                     <ChevronLeft className="h-5 w-5" />
                     <span>Back</span>
                 </NavLink>
-                {/* <div className="font-bold text-lg">Driver Dashboard</div>
-                <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-                    <Menu className="h-5 w-5" />
-                </Button> */}
+
             </div>
 
-            {/* Mobile sidebar */}
-            {/* {isSidebarOpen && (
-                <div className="md:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-                    <div className="fixed inset-y-0 right-0 w-3/4 max-w-xs bg-background p-6 shadow-lg">
-                        <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(false)}>
-                            <ChevronLeft className="h-5 w-5" />
-                        </Button>
-                    </div>
-                </div>
-            )} */}
+
 
             <div className="flex flex-1 flex-col md:flex-row">
                 {/* Map area */}

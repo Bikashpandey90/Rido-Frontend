@@ -118,6 +118,10 @@ export default function LocationSearch({
                 },
             )
         }
+        if (!("geolocation" in navigator)) {
+            return <p>Geolocation is not supported by your browser.</p>
+        }
+
     }
 
     const { field } = useController({

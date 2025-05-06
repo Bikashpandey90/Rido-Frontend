@@ -6,9 +6,6 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { Label } from "@/components/ui/label"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as Yup from "yup"
-// import toast from 'react-toastify'
-
-
 import { useContext, useState } from "react"
 import authSvc, { UserType } from "./auth.service"
 import { InputType, TextInputField } from "@/components/form/input.field"
@@ -31,6 +28,7 @@ const Login = () => {
         setShowRiderPassword((prev) => !prev)
     }
 
+
     const LoginDTO = Yup.object({
         username: Yup.string().email('Invalid email').required('Email is required'),
         password: Yup.string().required('Password is required'),
@@ -39,6 +37,7 @@ const Login = () => {
 
 
     const { control, handleSubmit, formState: { errors } } = useForm({ resolver: yupResolver(LoginDTO) })
+
 
     const submitForm = async (data: { username: string, password: string }) => {
         setLoading(true)
@@ -50,9 +49,10 @@ const Login = () => {
             }
             let response: UserType = await authSvc.loginApi(payload)
             setLoggedInUser(response)
-            console.log(response)
 
-            navigate('/ride')
+            
+            navigate(`/${loggedInUser.role}/ride`)
+
             // toast.success("Login sucess")
         } catch (exception) {
             console.log(exception)
@@ -74,9 +74,8 @@ const Login = () => {
             }
             let response: UserType = await authSvc.RiderLoginApi(payload)
             setLoggedInUser(response)
-            console.log(response)
 
-            navigate('/ride')
+            navigate(`/${loggedInUser.role}/ride`)
             // toast.success("Login sucess")
         } catch (exception) {
             console.log(exception)

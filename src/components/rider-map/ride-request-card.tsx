@@ -1,4 +1,3 @@
-"use client"
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -8,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import mapsSvc from "@/pages/customer/map/maps.services"
 import { useState, useEffect, useContext } from "react"
 import { RideContext } from "@/context/ride.context"
+import MessageBox from "../chat/chatBox"
 
 interface RideRequestCardProps {
     request: {
@@ -96,6 +96,7 @@ export default function RideRequestCard({
     const [cancelling, setCancelling] = useState(false)
     const [endButton, setEndButton] = useState(false)
     const [showCompletedView, setShowCompletedView] = useState(false)
+    const [isMessageOpen, setIsMessageOpen] = useState(false)
     // First, let's add a state to track if a ride has been accepted
     // const [hasAcceptedRide, setHasAcceptedRide] = useState(false)
     const [navigating, setNavigating] = useState(false)
@@ -259,7 +260,13 @@ export default function RideRequestCard({
                                 >
                                     {accepting ? "Accepting" : "Accept"}
                                 </Button>
-                                <Button variant="outline" className="flex-1" onClick={() => onDecline(request._id)}>
+                                <Button
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => {
+                                        onDecline(request._id)
+                                    }}
+                                >
                                     Decline
                                 </Button>
                             </>
@@ -337,11 +344,22 @@ export default function RideRequestCard({
                             >
                                 Call Passenger
                             </Button>
-                            <Button variant="outline" className="flex-1 ml-2">
+                            <Button variant="outline" className="flex-1 ml-2" onClick={() => {
+                                setIsMessageOpen(!isMessageOpen)
+
+                            }}>
                                 Message
                             </Button>
                         </CardFooter>
                     </Card>
+                    {/* Message box appears inline below the passenger info card */}
+                    {hasAcceptedRide && ride && (
+                        <MessageBox
+                            isOpen={isMessageOpen}
+                            onClose={() => setIsMessageOpen(false)}
+                            rider={ride.userId}
+                        />
+                    )}
 
                     <Card>
                         <CardHeader>

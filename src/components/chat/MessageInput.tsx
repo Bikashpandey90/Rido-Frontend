@@ -8,8 +8,8 @@ import { InputType, TextInputField } from "../form/input.field";
 import { User } from "../sidebar/sidebar";
 
 const MessageInput = ({ user }: { user: User }) => {
-    const [text, setText] = useState("");
-    const [imagePreview, setImagePreview] = useState(null);
+    // const [text, setText] = useState("");
+    const [imagePreview,] = useState(null);
     const fileInputRef = useRef(null);
 
 
@@ -42,24 +42,9 @@ const MessageInput = ({ user }: { user: User }) => {
 
 
     const submitForm = async (data: { message: string }) => {
-        // e.preventDefault();
-        // if (!text.trim() && !imagePreview) return;
 
-        // try {
-        //     await sendMessage({
-        //         text: text.trim(),
-        //         image: imagePreview,
-        //     });
 
-        //     // Clear form
-        //     setText("");
-        //     setImagePreview(null);
-        //     if (fileInputRef.current) fileInputRef.current.value = "";
-        // } catch (error) {
-        //     console.error("Failed to send message:", error);
-        // }
 
-        
         const payload = {
             message: data.message,
             receiver: user._id,

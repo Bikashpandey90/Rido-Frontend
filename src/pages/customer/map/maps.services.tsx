@@ -103,6 +103,25 @@ class MapsService extends HttpService {
         }
     }
 
+    async deleteSavedLocationById(id: string) {
+        try {
+            const response = await this.deleteRequest(`/misc/${id}`, { auth: true })
+            return response.data
+
+        } catch (exception) {
+            throw exception
+        }
+    }
+    async saveLocation(data: any) {
+        try {
+            const response = await this.postRequest('/misc/save-address', data, { auth: true })
+            return response.data
+
+        } catch (exception) {
+            throw exception
+        }
+    }
+
 
 
 

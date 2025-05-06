@@ -1,4 +1,3 @@
-import { initialify } from "@/lib/utils"
 import { X } from "lucide-react"
 import { User } from "../sidebar/sidebar"
 

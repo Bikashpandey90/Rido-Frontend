@@ -7,19 +7,18 @@ import HomePageLayout from "@/pages/homepage/homepage-layout";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
 import CustomerDashboard from "@/pages/customer/dashboard/dashboard";
-import MapPage from "@/pages/customer/map/map";
 import RiderDashboard from "@/pages/rider/dashboard/dashboard";
-import RiderNavigationPage from "@/pages/rider/rider-nav/rider-navigation";
-// import MapCheck from "@/pages/customer/map/map-check";
-// import NewMapPage from "@/pages/customer/map/new-map-check";
-// import MapCheck from "@/pages/customer/map/map-check";
+
 import ProfilePage from "@/pages/customer/profile/profile";
 import RiderProfile from "@/pages/rider/profile/profile";
-import NewMapPage from "@/pages/customer/map/new-map-check";
 import RiderPage from "@/pages/rider/rider-map/rider-map";
 import ReviewsPage from "@/pages/review/review-page";
 import RidesPage from "@/pages/rides/rides-page";
 import ChatPage from "@/pages/chat/chat-page";
+import MapPage from "@/pages/customer/map/map";
+import RiderPageLayout from "@/pages/rider/layout/layout";
+import CustomerPageLayout from "@/pages/customer/layout/layout";
+import PermissionCheck from "./permission.config";
 
 
 
@@ -43,40 +42,78 @@ const Routing: FC = () => {
                 }, {
                     path: '/register',
                     element: <Register />
-                }, {
-                    path: '/dashboard',
-                    element: <CustomerDashboard />
-                }, {
-                    path: '/ride',
-                    element: <MapPage />
-                }, {
+                },
+                {
                     path: '/rider',
-                    element: <RiderDashboard />
-                }, {
-                    path: '/rider-nav',
-                    element: <RiderNavigationPage />
-                }, {
-                    path: '/map-check',
-                    element: <NewMapPage />
-                }, {
-                    path: '/profile',
-                    element: <ProfilePage />
-                }, {
-                    path: '/rider/profile',
-                    element: <RiderProfile />
-                }, {
-                    path: '/rider-map',
-                    element: <RiderPage />
-                }, {
-                    path: '/reviews',
-                    element: <ReviewsPage />
+                    element: <PermissionCheck allowedRole="rider">
+                        <RiderPageLayout />
+                    </PermissionCheck>,
+                    children: [
+                        {
+                            path: "*",
+                            element: <NotFound />
 
-                }, {
-                    path: '/rides',
-                    element: <RidesPage />
-                }, {
-                    path: 'chat',
-                    element: <ChatPage />
+                        },
+                        {
+
+                            element: <RiderPage />,
+                            index: true
+
+                        }, {
+                            path: 'profile',
+                            element: <RiderProfile />
+                        },
+                        {
+                            path: 'reviews',
+                            element: <ReviewsPage />
+
+                        },
+                        {
+                            path: 'rides',
+                            element: <RidesPage />
+                        },
+                        {
+                            path: 'chat',
+                            element: <ChatPage />
+                        }
+                    ]
+
+
+                },
+                {
+                    path: '/customer',
+                    element: <PermissionCheck allowedRole="customer">
+                        <CustomerPageLayout />
+                    </PermissionCheck>,
+                    children: [
+                        {
+                            index: true,
+                            element: <MapPage />,
+                        },
+                        {
+                            path: "*",
+                            element: <NotFound />
+
+                        },
+
+                        {
+                            path: 'profile',
+                            element: <ProfilePage />
+                        },
+                        {
+                            path: 'reviews',
+                            element: <ReviewsPage />
+
+                        },
+                        {
+                            path: 'rides',
+                            element: <RidesPage />
+                        },
+                        {
+                            path: 'chat',
+                            element: <ChatPage />
+                        }
+                    ]
                 }
             ]
         }
