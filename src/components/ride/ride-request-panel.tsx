@@ -1,3 +1,4 @@
+"use client"
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -6,7 +7,28 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Clock, Car, ChevronLeft, CreditCard, MapPin, User, CheckCircle, Star, DollarSign, Wallet, Plus, Bike, MoreVertical, Check, Trash, Edit, Home, Building2 } from "lucide-react"
+import {
+    Clock,
+    Car,
+    ChevronLeft,
+    CreditCard,
+    MapPin,
+    User,
+    CheckCircle,
+    Star,
+    DollarSign,
+    Wallet,
+    Plus,
+    Bike,
+    MoreVertical,
+    Trash,
+    Edit,
+    Home,
+    Building2,
+    Save,
+    Briefcase,
+    ListPlus,
+} from "lucide-react"
 import LocationSearch from "./location-search"
 import mapsSvc from "@/pages/customer/map/maps.services"
 import * as Yup from "yup"
@@ -15,8 +37,20 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import reviewSvc from "@/pages/review/review.svc"
 import { Textarea } from "../ui/textarea"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "../ui/dropdown-menu"
 import MessageBox from "../chat/chatBox"
+import { shortify } from "@/lib/utils"
+import { v4 as uuidv4 } from "uuid"
+import CryptoJS from "crypto-js"
 
 interface RideRequestPanelProps {
     latitude: number | null
@@ -32,28 +66,24 @@ interface RideRequestPanelProps {
 }
 export interface RecentRideLocations {
     dropOffLocation: {
-        type: "Point",
-        coordinates: [number, number],
-        name: String,
-        _id: String
-    },
-    _id: String
-
+        type: "Point"
+        coordinates: [number, number]
+        name: string
+        _id: string
+    }
+    _id: string
 }
 export interface SavedLocations {
     location: {
-        coordinates: [
-            number,
-            number
-        ],
+        coordinates: [number, number]
         type: "Point"
-    },
-    _id: String,
-    userId: String,
-    locationName: String,
-    isDefault: Boolean,
-    title: "work" | 'home' | "other" | 'recent',
-    status: "active" | 'inactive',
+    }
+    _id: string
+    userId: string
+    locationName: string
+    isDefault: boolean
+    title: "work" | "home" | "other" | "recent"
+    status: "active" | "inactive"
 }
 
 export default function RideRequestPanel({
@@ -86,7 +116,6 @@ export default function RideRequestPanel({
     const [savedLocations, setSavedLocations] = useState<SavedLocations[]>([])
     const [recentLocations, setRecentLocations] = useState<RecentRideLocations[]>([])
     const [isMessageOpen, setIsMessageOpen] = useState(false)
-
 
     const rideRequestDTO = Yup.object({
         // pickUpLocation: Yup.object({
@@ -282,12 +311,63 @@ export default function RideRequestPanel({
         setIsPaymentProcessing(true)
         try {
             // Simulate payment processing
-            await new Promise((resolve) => setTimeout(resolve, 1500))
+            if (paymentMethod === "esewa") {
+                try {
+                    if (!ride?._id || !ride?.fare) {
+                        throw new Error("Ride information is missing")
+                    }
 
-            const response = await mapsSvc.makePayment(ride?._id, paymentMethod, ride?.fare)
-            console.log(response.detail)
-            console.log(`Processing ${paymentMethod} payment for ride: ${ride?._id}`)
-            setPaymentComplete(true)
+                    const fareString = ride.fare.toString()
+                    const secretKey = import.meta.env.VITE_APP_ESEWA_SECRET
+
+                    if (!secretKey) {
+                        throw new Error("eSewa secret key is not defined in environment variables")
+                    }
+
+                    // Update form data with the latest values
+                    const newSignature = generateSignature({
+                        total_amount: fareString,
+                        transaction_uuid: ride._id,
+                        product_code: "EPAYTEST",
+                        secret: secretKey,
+                    })
+
+                    if (!newSignature) {
+                        throw new Error("Failed to generate signature")
+                    }
+
+                    // Update form data
+                    setFormData((prev) => ({
+                        ...prev,
+                        amount: fareString,
+                        total_amount: fareString,
+                        transaction_uuid: ride._id,
+                        signature: newSignature,
+                    }))
+
+                    console.log("Initiating eSewa payment with signature:", newSignature)
+
+                    // Use a longer delay to ensure state updates
+                    setTimeout(() => {
+                        const submitButton = document.getElementById("payment-initiate-button")
+                        if (submitButton) {
+                            submitButton.click()
+                        } else {
+                            throw new Error("Payment form submit button not found")
+                        }
+                    }, 500)
+                } catch (error) {
+                    console.error("eSewa payment error:", error)
+                    alert(`Failed to initialize eSewa payment: ${error.message || "Unknown error"}`)
+                }
+            } else if (paymentMethod === "cash") {
+                const response = await mapsSvc.makePayment(ride?._id, paymentMethod, ride?.fare)
+                console.log(response.detail)
+                setPaymentComplete(true)
+            } else {
+                console.error("Invalid payment method selected")
+                alert("Please select a valid payment method")
+            }
         } catch (error) {
             console.error("Payment processing error:", error)
             alert("Payment processing failed. Please try again.")
@@ -301,7 +381,6 @@ export default function RideRequestPanel({
             const response = await mapsSvc.fetchSavedLocations()
             setSavedLocations(response.detail)
             console.log(response.detail)
-
         } catch (exception) {
             console.error("Error fetching saved locations:", exception)
         }
@@ -311,7 +390,6 @@ export default function RideRequestPanel({
             const response = await mapsSvc.fetchRecentRidesLocations()
             setRecentLocations(response.detail)
             console.log(response.detail)
-
         } catch (exception) {
             console.error("Error fetching saved locations:", exception)
         }
@@ -320,31 +398,49 @@ export default function RideRequestPanel({
         try {
             const response = await mapsSvc.deleteSavedLocationById(id)
             console.log(response.detail)
-            if (response?.status === 'ADDRESS_DELETED') {
+            if (response?.status === "ADDRESS_DELETED") {
                 getSavedLocations()
             }
-
-
         } catch (exception) {
             console.log(exception)
         }
     }
-    const saveLocations = async (data: any) => {
+    const saveLocations = async (data: any, title: string) => {
+        try {
+            const payload = {
+                locationName: data.dropOffLocation?.name,
+                location: {
+                    coorinates: data.dropOffLocation.coordinates,
+                },
+                title: title,
+            }
+            console.log(payload)
+            const response = await mapsSvc.saveLocation(payload)
+            if (response?.status === "SAVED_ADDRESS_SUCCESSFULLY") {
+                getSavedLocations()
+            }
+        } catch (exception) {
+            console.log(exception)
+        }
+    }
+    const updateSavedLocations = async (data: any, title: string) => {
         try {
             let payload = {
 
             }
-            const response = await mapsSvc.saveLocation(payload)
+            const response = await mapsSvc.updateSavedLocationsDetails(payload)
+            
 
         } catch (exception) {
             console.log(exception)
         }
-
     }
     useEffect(() => {
         getSavedLocations()
         getRecentLocations()
     }, [])
+
+
 
     const getLocationIcon = (title: string) => {
         switch (title) {
@@ -512,7 +608,7 @@ export default function RideRequestPanel({
                                         <img
                                             src={ride.rider.image || "/placeholder.svg"}
                                             className="h-11 w-11 rounded-full object-contain"
-                                            alt={ride.rider.name}
+                                            alt={ride?.rider?.name}
                                         />
                                     ) : (
                                         <User className="h-6 w-6 text-blue-700" />
@@ -558,270 +654,535 @@ export default function RideRequestPanel({
         }
     }
 
+    const [formData, setFormData] = useState(() => {
+        // Get the secret key from environment variables
+        const secretKey = import.meta.env.VITE_APP_ESEWA_SECRET
 
+        // Log if secret key is missing
+        if (!secretKey) {
+            console.warn("eSewa secret key is not defined in environment variables")
+        }
 
-    return (
-        <div className="w-full md:w-96 bg-background border-t md:border-t-0 md:border-l md:h-screen md:overflow-y-auto">
-            {isWaitingForDriver ? (
-                <div className="p-4 space-y-6">
-                    <div className="text-center space-y-4">
-                        <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto">
-                            <Car className="h-8 w-8 text-blue-700" />
-                        </div>
-                        <h2 className="text-xl font-bold">Finding you a driver...</h2>
-                        <div className="flex justify-center">
-                            <div className="animate-pulse flex space-x-2">
-                                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                            </div>
-                        </div>
-                        <p className="text-muted-foreground">Please wait while we connect you with a driver</p>
-                    </div>
+        const baseUrl = import.meta.env.VITE_APP_BASE_URL || window.location.origin
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Ride Request Details</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex justify-between">
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Pickup</p>
-                                    <p className="font-medium">{ride?.pickUpLocation?.name?.split(" ").slice(0, 3).join(" ")}...</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm text-muted-foreground">Destination</p>
-                                    <p className="font-medium">{ride?.dropOffLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
-                                </div>
-                            </div>
+        return {
+            amount: "0",
+            tax_amount: "0",
+            total_amount: "0",
+            transaction_uuid: uuidv4(), // Use a generated UUID as default
+            product_service_charge: "0",
+            product_delivery_charge: "0",
+            product_code: "EPAYTEST",
+            success_url: `${baseUrl}/payment-success`,
+            failure_url: `${baseUrl}/payment-failed`,
+            signature: "",
+            secret: secretKey || "",
+            orderId: "",
+            signed_field_names: "total_amount,transaction_uuid,product_code",
+        }
+    })
 
-                            <Separator />
+    interface SignatureParams {
+        total_amount: string
+        transaction_uuid: string
+        product_code: string
+        secret: string
+        // orderId: string;
+    }
 
-                            <div className="flex justify-between">
-                                <div>
-                                    <p className="text-sm text-muted-foreground">Estimated Price</p>
-                                    <p className="font-medium">Nrs {ride?.fare}</p>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button variant="destructive" className="w-full" onClick={() => setIsWaitingForDriver(false)}>
-                                Cancel Request
-                            </Button>
-                        </CardFooter>
-                    </Card>
+    const generateSignature = ({ total_amount, transaction_uuid, product_code, secret }: SignatureParams): string => {
+        // Check if any required parameters are missing
+        if (!total_amount || !transaction_uuid || !product_code || !secret) {
+            console.error("Missing required parameters for signature generation:", {
+                total_amount,
+                transaction_uuid,
+                product_code,
+                secretProvided: !!secret,
+            })
+            return ""
+        }
 
-                    {/* Simulate driver found after 5 seconds */}
-                    <div className="hidden">
-                        {/* {setTimeout(() => {
-                            handleRequestRide()
-                        }, 5000)} */}
-                        {ride?.RideStatus === "accepted" &&
-                            (() => {
-                                handleRequestRide()
-                                return null
-                            })()}
-                    </div>
-                </div>
-            ) : !isRideRequested ? (
-                <div className="p-4">
-                    {step === "location" && (
-                        <div className="space-y-4">
-                            <h2 className="text-xl font-bold">Request a Ride</h2>
+        try {
+            const hashString = `total_amount=${total_amount},transaction_uuid=${transaction_uuid},product_code=${product_code}`
+            console.log("Generating signature with:", { hashString, secretLength: secret.length })
 
-                            <form onSubmit={handleSubmit(submitForm)} className="space-y-4">
-                                <LocationSearch
-                                    name="pickupLocation"
-                                    control={control}
-                                    id="pickup"
-                                    label="Pickup Location"
-                                    placeholder="Current location"
-                                    onLocationSelect={handlePickupSelect}
-                                    useCurrentLocation={true}
-                                    errMsg={errors?.pickupLocation?.message as string}
-                                    captureLocationName={true}
-                                />
+            // Convert secret to WordArray if it's a string
+            const secretKey = typeof secret === "string" ? CryptoJS.enc.Utf8.parse(secret) : secret
 
-                                <LocationSearch
-                                    name="dropOffLocation"
-                                    control={control}
-                                    id="destination"
-                                    label="Destination"
-                                    placeholder="Enter destination"
-                                    onLocationSelect={handleDestinationSelect}
-                                    errMsg={errors?.dropOffLocation?.message as string}
-                                    captureLocationName={true}
-                                />
-                                <input type="hidden" {...control.register("vehicleType")} defaultValue="bike" />
+            const hash = CryptoJS.HmacSHA256(hashString, secretKey)
+            const hashedSignature = CryptoJS.enc.Base64.stringify(hash)
+            return hashedSignature
+        } catch (error) {
+            console.error("Error generating signature:", error)
+            return ""
+        }
+    }
+    useEffect(() => {
+        if (ride?._id && ride?.fare) {
+            const fareString = ride.fare.toString()
+            const secretKey = import.meta.env.VITE_APP_ESEWA_SECRET
 
-                                <Tabs defaultValue="now">
-                                    <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger value="now" className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4" />
-                                            Now
-                                        </TabsTrigger>
-                                        <TabsTrigger value="schedule" className="flex items-center gap-2">
-                                            <Clock className="h-4 w-4" />
-                                            Schedule
-                                        </TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="now">
-                                        <div className="pt-4">
-                                            <Button
-                                                className="w-full bg-blue-600 hover:bg-blue-700"
-                                                onClick={() => {
-                                                    setShowRoute(true)
-                                                }}
-                                                type="submit"
-                                                disabled={isSubmitting}
-                                            >
-                                                {isSubmitting ? "Requesting a ride..." : "Continue"}
-                                            </Button>
-                                        </div>
-                                    </TabsContent>
-                                    <TabsContent value="schedule">
-                                        <div className="pt-4 space-y-4">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="date">Date</Label>
-                                                    <Input id="date" type="date" />
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="time">Time</Label>
-                                                    <Input id="time" type="time" />
-                                                </div>
-                                            </div>
-                                            <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => setStep("vehicle")}>
-                                                Continue
-                                            </Button>
-                                        </div>
-                                    </TabsContent>
-                                </Tabs>
+            // Check if secret key is available
+            if (!secretKey) {
+                console.error("eSewa secret key is not defined in environment variables")
+                return
+            }
 
-                                <div className="bg-white dark:bg-gray-950 rounded-xl p-4 shadow-sm border">
-                                    <h3 className="font-semibold text-lg mb-3">Saved Locations</h3>
-                                    <div className="space-y-3">
-                                        {savedLocations && savedLocations.length > 0 ? (
-                                            savedLocations.map((location, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors duration-200"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                                            {getLocationIcon(location?.title)}
-                                                        </div>
-                                                        <div>
-                                                            <p className="font-medium">{location.title.charAt(0).toUpperCase() + location.title.slice(1)}</p>
-                                                            <p className="text-sm text-muted-foreground">{location.locationName}</p>
-                                                        </div>
-                                                    </div>
+            console.log("Preparing eSewa form data with:", {
+                fareString,
+                rideId: ride._id,
+                productCode: "EPAYTEST",
+                secretKeyAvailable: !!secretKey,
+            })
 
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                <MoreVertical className="h-4 w-4" />
-                                                                <span className="sr-only">Open menu</span>
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => { }}>
-                                                                <Edit className="h-4 w-4 mr-2" />
-                                                                Edit
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem
-                                                                className="text-red-600 dark:text-red-400"
-                                                                onClick={() => { deleteSavedLocation(location._id) }}
-                                                            >
-                                                                <Trash className="h-4 w-4 mr-2" />
-                                                                Delete
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center h-32 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                                                <p className="text-sm text-muted-foreground text-center mt-4">No saved locations available.</p>
-                                                <Button className="mt-3" variant="secondary" onClick={() => { }}>
-                                                    <Plus className="h-4 w-4 mr-2" />
-                                                    Add Saved Location
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+            setFormData((prevFormData) => {
+                const updatedData = {
+                    ...prevFormData,
+                    amount: fareString,
+                    total_amount: fareString,
+                    transaction_uuid: ride._id,
+                    secret: secretKey,
+                }
 
-                                {/* Recent Locations Section */}
-                                <div className="bg-white dark:bg-gray-950 rounded-xl p-4 shadow-sm border">
-                                    <h3 className="font-semibold text-lg mb-3">Recent Locations</h3>
-                                    <div className="space-y-3">
-                                        {recentLocations && recentLocations.length > 0 ? (
-                                            recentLocations.map((location, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors duration-200"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                                            <MapPin className="h-4 w-4 text-blue-700" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="font-medium">Recent</p>
-                                                            <p className="text-sm text-muted-foreground">
-                                                                {location.dropOffLocation.name.length > 30
-                                                                    ? `${location.dropOffLocation.name.substring(0, 30)}...`
-                                                                    : location.dropOffLocation.name}
-                                                            </p>
-                                                        </div>
-                                                    </div>
+                // Generate signature after updating the data
+                const signature = generateSignature({
+                    total_amount: fareString,
+                    transaction_uuid: ride._id,
+                    product_code: updatedData.product_code,
+                    secret: secretKey,
+                })
 
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                <MoreVertical className="h-4 w-4" />
-                                                                <span className="sr-only">Open menu</span>
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => { saveLocations(location) }}>
-                                                                <Check className="h-4 w-4 mr-2" />
-                                                                Save
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem
-                                                                className="text-red-600 dark:text-red-400"
-                                                                onClick={() => { }}
-                                                            >
-                                                                <Trash className="h-4 w-4 mr-2" />
-                                                                Delete
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
+                return {
+                    ...updatedData,
+                    signature: signature,
+                }
+            })
 
+            console.log("Updated eSewa form data with ride details")
+        }
+    }, [ride])
 
+    // Add this function to handle return from eSewa payment
+    useEffect(() => {
+        // Check if we're returning from eSewa payment
+        const urlParams = new URLSearchParams(window.location.search)
+        const status = urlParams.get("status")
+        const refId = urlParams.get("refId")
 
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center h-32 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                                                <p className="text-sm text-muted-foreground text-center mt-4">No recent locations available.</p>
-                                                <Button className="mt-3" variant="secondary" onClick={() => { }}>
-                                                    <Bike className="h-4 w-4 mr-2" />
-                                                    Start a Ride...
-                                                </Button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    )
+        if (status && refId && ride?._id) {
+            const handleEsewaReturn = async () => {
+                try {
+                    if (status === "success") {
+                        console.log("eSewa payment successful, ref ID:", refId)
+                        // Call your payment verification API
+                        const response = await mapsSvc.makePayment(ride._id, "esewa", ride.fare, refId)
+                        console.log("Payment verification response:", response.detail)
+                        setPaymentComplete(true)
+                    } else {
+                        console.error("eSewa payment failed")
+                        alert("Payment was not successful. Please try again.")
                     }
 
-                    {
-                        step === "vehicle" && (
+                    // Clear URL parameters to prevent reprocessing
+                    window.history.replaceState({}, document.title, window.location.pathname)
+                } catch (error) {
+                    console.error("Error handling eSewa return:", error)
+                }
+            }
+
+            handleEsewaReturn()
+        }
+    }, [window.location.search, ride])
+
+    return (
+        <>
+            {/* Esewa Checkout Form  */}
+
+            <form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST" className="hidden">
+                <input type="hidden" id="amount" name="amount" required value={formData.amount} />
+                <input type="hidden" id="tax_amount" name="tax_amount" value={formData.tax_amount} required />
+                <input type="hidden" id="total_amount" name="total_amount" value={formData.total_amount} required />
+                <input type="hidden" id="transaction_uuid" name="transaction_uuid" value={formData.transaction_uuid} required />
+                <input type="hidden" id="product_code" name="product_code" value={formData.product_code} required />
+                <input
+                    type="hidden"
+                    id="product_service_charge"
+                    name="product_service_charge"
+                    value={formData.product_service_charge}
+                    required
+                />
+                <input
+                    type="hidden"
+                    id="product_delivery_charge"
+                    name="product_delivery_charge"
+                    value={formData.product_delivery_charge}
+                    required
+                />
+                <input type="hidden" id="success_url" name="success_url" value={formData.success_url} required />
+                <input type="hidden" id="failure_url" name="failure_url" value={formData.failure_url} required />
+                <input
+                    type="hidden"
+                    id="signed_field_names"
+                    name="signed_field_names"
+                    value={formData.signed_field_names}
+                    required
+                />
+                <input type="hidden" id="signature" name="signature" value={formData.signature} required />
+                <input value="Submit" id="payment-initiate-button" type="submit" className="hidden" />
+            </form>
+            <div className="w-full md:w-96 bg-background border-t md:border-t-0 md:border-l md:h-screen md:overflow-y-auto">
+                {isWaitingForDriver ? (
+                    <div className="p-4 space-y-6">
+                        <div className="text-center space-y-4">
+                            <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto">
+                                <Car className="h-8 w-8 text-blue-700" />
+                            </div>
+                            <h2 className="text-xl font-bold">Finding you a driver...</h2>
+                            <div className="flex justify-center">
+                                <div className="animate-pulse flex space-x-2">
+                                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                    <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+                                </div>
+                            </div>
+                            <p className="text-muted-foreground">Please wait while we connect you with a driver</p>
+                        </div>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Ride Request Details</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Pickup</p>
+                                        <p className="font-medium">{ride?.pickUpLocation?.name?.split(" ").slice(0, 3).join(" ")}...</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm text-muted-foreground">Destination</p>
+                                        <p className="font-medium">{ride?.dropOffLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
+                                    </div>
+                                </div>
+
+                                <Separator />
+
+                                <div className="flex justify-between">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Estimated Price</p>
+                                        <p className="font-medium">Nrs {ride?.fare}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                            <CardFooter>
+                                <Button variant="destructive" className="w-full" onClick={() => setIsWaitingForDriver(false)}>
+                                    Cancel Request
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        {/* Simulate driver found after 5 seconds */}
+                        <div className="hidden">
+                            {/* {setTimeout(() => {
+                            handleRequestRide()
+                        }, 5000)} */}
+                            {ride?.RideStatus === "accepted" &&
+                                (() => {
+                                    handleRequestRide()
+                                    return null
+                                })()}
+                        </div>
+                    </div>
+                ) : !isRideRequested ? (
+                    <div className="p-4">
+                        {step === "location" && (
+                            <div className="space-y-4">
+                                <h2 className="text-xl font-bold">Request a Ride</h2>
+
+                                <form onSubmit={handleSubmit(submitForm)} className="space-y-4">
+                                    <LocationSearch
+                                        name="pickupLocation"
+                                        control={control}
+                                        id="pickup"
+                                        label="Pickup Location"
+                                        placeholder="Current location"
+                                        onLocationSelect={handlePickupSelect}
+                                        useCurrentLocation={true}
+                                        errMsg={errors?.pickupLocation?.message as string}
+                                        captureLocationName={true}
+                                    />
+
+                                    <LocationSearch
+                                        name="dropOffLocation"
+                                        control={control}
+                                        id="destination"
+                                        label="Destination"
+                                        placeholder="Enter destination"
+                                        onLocationSelect={handleDestinationSelect}
+                                        errMsg={errors?.dropOffLocation?.message as string}
+                                        captureLocationName={true}
+                                    />
+                                    <input type="hidden" {...control.register("vehicleType")} defaultValue="bike" />
+
+                                    <Tabs defaultValue="now">
+                                        <TabsList className="grid w-full grid-cols-2">
+                                            <TabsTrigger value="now" className="flex items-center gap-2">
+                                                <Clock className="h-4 w-4" />
+                                                Now
+                                            </TabsTrigger>
+                                            <TabsTrigger value="schedule" className="flex items-center gap-2">
+                                                <Clock className="h-4 w-4" />
+                                                Schedule
+                                            </TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="now">
+                                            <div className="pt-4">
+                                                <Button
+                                                    className="w-full bg-blue-600 hover:bg-blue-700"
+                                                    onClick={() => {
+                                                        setShowRoute(true)
+                                                    }}
+                                                    type="submit"
+                                                    disabled={isSubmitting}
+                                                >
+                                                    {isSubmitting ? "Requesting a ride..." : "Continue"}
+                                                </Button>
+                                            </div>
+                                        </TabsContent>
+                                        <TabsContent value="schedule">
+                                            <div className="pt-4 space-y-4">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="date">Date</Label>
+                                                        <Input id="date" type="date" />
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <Label htmlFor="time">Time</Label>
+                                                        <Input id="time" type="time" />
+                                                    </div>
+                                                </div>
+                                                <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => setStep("vehicle")}>
+                                                    Continue
+                                                </Button>
+                                            </div>
+                                        </TabsContent>
+                                    </Tabs>
+
+                                    <div className="bg-white dark:bg-gray-950 rounded-xl p-4 shadow-sm border">
+                                        <h3 className="font-semibold text-lg mb-3">Saved Locations</h3>
+                                        <div className="space-y-3">
+                                            {savedLocations && savedLocations.length > 0 ? (
+                                                savedLocations.map((location, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors duration-200"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                                                {getLocationIcon(location?.title)}
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-medium">
+                                                                    {location.title.charAt(0).toUpperCase() + location.title.slice(1)}
+                                                                </p>
+                                                                <p className="text-sm text-muted-foreground">{shortify(location.locationName)}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                    <MoreVertical className="h-4 w-4" />
+                                                                    <span className="sr-only">Open menu</span>
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        <Edit className="h-4 w-4 mr-2" />
+                                                                        Edit
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent >
+
+                                                                        <DropdownMenuItem>
+                                                                            <Save className="h-4 w-4 mr-2" />
+                                                                            Save as
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuSeparator />
+
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Home clicked")
+                                                                                saveLocations(location, "home")
+                                                                            }}
+                                                                        >
+                                                                            <Home className="h-4 w-4 mr-2" />
+                                                                            Home
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Work clicked")
+                                                                                saveLocations(location, "work")
+                                                                            }}
+                                                                        >
+                                                                            <Briefcase className="h-4 w-4 mr-2" />
+                                                                            Work
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Others clicked")
+                                                                                saveLocations(location, "other")
+                                                                            }}
+                                                                        >
+                                                                            <ListPlus className="h-4 w-4 mr-2" />
+                                                                            Others
+                                                                        </DropdownMenuItem>
+
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Recent clicked")
+                                                                                saveLocations(location, "recent")
+                                                                            }}
+                                                                        >
+                                                                            <Clock className="h-4 w-4 mr-2" />
+                                                                            Recent
+                                                                        </DropdownMenuItem>
+
+
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem
+                                                                    className="text-red-600 dark:text-red-400"
+                                                                    onClick={() => {
+                                                                        deleteSavedLocation(location._id)
+                                                                    }}
+                                                                >
+                                                                    <Trash className="h-4 w-4 mr-2" />
+                                                                    Delete
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center h-32 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                                                    <p className="text-sm text-muted-foreground text-center mt-4">
+                                                        No saved locations available.
+                                                    </p>
+                                                    <Button className="mt-3" variant="secondary" onClick={() => { }}>
+                                                        <Plus className="h-4 w-4 mr-2" />
+                                                        Add Saved Location
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Recent Locations Section */}
+                                    <div className="bg-white dark:bg-gray-950 rounded-xl p-4 shadow-sm border">
+                                        <h3 className="font-semibold text-lg mb-3">Recent Locations</h3>
+                                        <div className="space-y-3">
+                                            {recentLocations && recentLocations.length > 0 ? (
+                                                recentLocations.map((location, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors duration-200"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                                                <MapPin className="h-4 w-4 text-blue-700" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="font-medium">Recent</p>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    {location?.dropOffLocation?.name.length > 30
+                                                                        ? `${location?.dropOffLocation?.name.substring(0, 30)}...`
+                                                                        : location?.dropOffLocation?.name}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                                    <MoreVertical className="h-4 w-4" />
+                                                                    <span className="sr-only">Open menu</span>
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        <Save className="h-4 w-4 mr-2" />
+                                                                        Save as
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Home clicked")
+                                                                                saveLocations(location, "home")
+                                                                            }}
+                                                                        >
+                                                                            <Home className="h-4 w-4 mr-2" />
+                                                                            Home
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Work clicked")
+                                                                                saveLocations(location, "work")
+                                                                            }}
+                                                                        >
+                                                                            <Briefcase className="h-4 w-4 mr-2" />
+                                                                            Work
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Others clicked")
+                                                                                saveLocations(location, "other")
+                                                                            }}
+                                                                        >
+                                                                            <ListPlus className="h-4 w-4 mr-2" />
+                                                                            Others
+                                                                        </DropdownMenuItem>
+
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                console.log("Recent clicked")
+                                                                                saveLocations(location, "recent")
+                                                                            }}
+                                                                        >
+                                                                            <Clock className="h-4 w-4 mr-2" />
+                                                                            Recent
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <DropdownMenuSeparator />
+                                                                <DropdownMenuItem className="text-red-600 dark:text-red-400" onClick={() => { }}>
+                                                                    <Trash className="h-4 w-4 mr-2" />
+                                                                    Remove
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center h-32 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
+                                                    <p className="text-sm text-muted-foreground text-center mt-4">
+                                                        No recent locations available.
+                                                    </p>
+                                                    <Button className="mt-3" variant="secondary" onClick={() => { }}>
+                                                        <Bike className="h-4 w-4 mr-2" />
+                                                        Start a Ride...
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        {step === "vehicle" && (
                             <div className="space-y-4">
                                 <div className="flex items-center">
                                     <Button variant="ghost" size="icon" onClick={() => setStep("location")} className="mr-2">
@@ -876,11 +1237,9 @@ export default function RideRequestPanel({
                                     ))}
                                 </div>
                             </div>
-                        )
-                    }
+                        )}
 
-                    {
-                        step === "payment" && (
+                        {step === "payment" && (
                             <div className="space-y-4">
                                 <div className="flex items-center">
                                     <Button variant="ghost" size="icon" onClick={() => setStep("vehicle")} className="mr-2">
@@ -921,11 +1280,9 @@ export default function RideRequestPanel({
                                     </Button>
                                 </div>
                             </div>
-                        )
-                    }
+                        )}
 
-                    {
-                        step === "confirmation" && (
+                        {step === "confirmation" && (
                             <div className="space-y-4">
                                 <div className="flex items-center">
                                     <Button variant="ghost" size="icon" onClick={() => setStep("payment")} className="mr-2">
@@ -985,135 +1342,133 @@ export default function RideRequestPanel({
                                     </CardFooter>
                                 </Card>
                             </div>
-                        )
-                    }
-                </div >
-            ) : // Check if ride is completed
-                ride?.RideStatus === "completed" ? (
-                    renderCompletedRide()
-                ) : (
-                    <div className="p-4 space-y-6">
-                        <div className="text-center space-y-2">
-                            <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto">
-                                <Car className="h-8 w-8 text-blue-700" />
+                        )}
+                    </div>
+                ) : // Check if ride is completed
+                    ride?.RideStatus === "completed" ? (
+                        renderCompletedRide()
+                    ) : (
+                        <div className="p-4 space-y-6">
+                            <div className="text-center space-y-2">
+                                <div className="h-16 w-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto">
+                                    <Car className="h-8 w-8 text-blue-700" />
+                                </div>
+                                <h2 className="text-xl font-bold">
+                                    {ride?.RideStatus === "ongoing" ? "Hang on tight" : "Your ride is on the way!"}
+                                </h2>
+                                <p className="text-muted-foreground">
+                                    {ride?.RideStatus === "ongoing"
+                                        ? "Rider will navigate you to your destination"
+                                        : "Driver will arrive in approximately 3 minutes"}
+                                </p>
                             </div>
-                            <h2 className="text-xl font-bold">
-                                {ride?.RideStatus === "ongoing" ? "Hang on tight" : "Your ride is on the way!"}
-                            </h2>
-                            <p className="text-muted-foreground">
-                                {ride?.RideStatus === "ongoing"
-                                    ? "Rider will navigate you to your destination"
-                                    : "Driver will arrive in approximately 3 minutes"}
-                            </p>
-                        </div>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Driver Information</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                        {ride?.rider?.image ? (
-                                            <img
-                                                src={ride.rider.image || "/placeholder.svg"}
-                                                className="h-11 w-11 rounded-full object-contain"
-                                                alt={ride.rider.name}
-                                            />
-                                        ) : (
-                                            <User className="h-6 w-6 text-blue-700" />
-                                        )}
-                                    </div>
-                                    <div>
-                                        <p className="font-medium">{ride?.rider?.name}</p>
-                                        <div className="flex items-center">
-                                            <p className="text-sm text-muted-foreground">4.9 ★</p>
-                                            <span className="mx-1">•</span>
-                                            <p className="text-sm text-muted-foreground">{ride?.vehicleDetails?.model}</p>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Driver Information</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                            {ride?.rider?.image ? (
+                                                <img
+                                                    src={ride.rider.image || "/placeholder.svg"}
+                                                    className="h-11 w-11 rounded-full object-contain"
+                                                    alt={ride.rider.name}
+                                                />
+                                            ) : (
+                                                <User className="h-6 w-6 text-blue-700" />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <p className="font-medium">{ride?.rider?.name}</p>
+                                            <div className="flex items-center">
+                                                <p className="text-sm text-muted-foreground">4.9 ★</p>
+                                                <span className="mx-1">•</span>
+                                                <p className="text-sm text-muted-foreground">{ride?.vehicleDetails?.model}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="flex justify-between">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">License Plate</p>
-                                        <p className="font-medium">{ride?.vehicleDetails?.plateNumber}</p>
+                                    <div className="flex justify-between">
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">License Plate</p>
+                                            <p className="font-medium">{ride?.vehicleDetails?.plateNumber}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-muted-foreground">Car Color</p>
+                                            <p className="font-medium">Silver</p>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-muted-foreground">Car Color</p>
-                                        <p className="font-medium">Silver</p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                            <CardFooter className="flex justify-between">
-                                <Button
-                                    variant="outline"
-                                    className="flex-1"
-                                    onClick={() => {
-                                        window.open(`tel:${ride?.rider?.phone}`, "_blank")
-                                    }}
-                                >
-                                    Call
-                                </Button>
-                                <Button variant="outline" className="flex-1 ml-2" onClick={() => {
-                                    setIsMessageOpen(!isMessageOpen)
-                                }}>
-                                    Message
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                        {ride && (
-                            <MessageBox
-                                isOpen={isMessageOpen}
-                                onClose={() => setIsMessageOpen(false)}
-                                rider={ride.rider}
-                            />
-                        )}
+                                </CardContent>
+                                <CardFooter className="flex justify-between">
+                                    <Button
+                                        variant="outline"
+                                        className="flex-1"
+                                        onClick={() => {
+                                            window.open(`tel:${ride?.rider?.phone}`, "_blank")
+                                        }}
+                                    >
+                                        Call
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        className="flex-1 ml-2"
+                                        onClick={() => {
+                                            setIsMessageOpen(!isMessageOpen)
+                                        }}
+                                    >
+                                        Message
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                            {ride && <MessageBox isOpen={isMessageOpen} onClose={() => setIsMessageOpen(false)} rider={ride.rider} />}
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Ride Details</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex justify-between">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">Pickup</p>
-                                        <p className="font-medium">{ride?.pickUpLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Ride Details</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <div className="flex justify-between">
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">Pickup</p>
+                                            <p className="font-medium">{ride?.pickUpLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-muted-foreground">Destination</p>
+                                            <p className="font-medium">{ride?.dropOffLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-muted-foreground">Destination</p>
-                                        <p className="font-medium">{ride?.dropOffLocation?.name.split(" ").slice(0, 3).join(" ")}...</p>
-                                    </div>
-                                </div>
 
-                                <Separator />
+                                    <Separator />
 
-                                <div className="flex justify-between">
-                                    <div>
-                                        <p className="text-sm text-muted-foreground">Estimated Price</p>
-                                        <p className="font-medium">Nrs {ride?.fare}</p>
+                                    <div className="flex justify-between">
+                                        <div>
+                                            <p className="text-sm text-muted-foreground">Estimated Price</p>
+                                            <p className="font-medium">Nrs {ride?.fare}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-muted-foreground">Payment Method</p>
+                                            <p className="font-medium">Credit Card (*4242)</p>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-sm text-muted-foreground">Payment Method</p>
-                                        <p className="font-medium">Credit Card (*4242)</p>
-                                    </div>
-                                </div>
-                            </CardContent>
-                            <CardFooter>
-                                <Button
-                                    variant="destructive"
-                                    className="w-full"
-                                    disabled={cancelling}
-                                    onClick={() => {
-                                        cancelRide(ride?._id)
-                                    }}
-                                >
-                                    {cancelling ? "Cancelling..." : "Cancel Ride"}
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    </div>
-                )}
-        </div >
+                                </CardContent>
+                                <CardFooter>
+                                    <Button
+                                        variant="destructive"
+                                        className="w-full"
+                                        disabled={cancelling}
+                                        onClick={() => {
+                                            cancelRide(ride?._id)
+                                        }}
+                                    >
+                                        {cancelling ? "Cancelling..." : "Cancel Ride"}
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        </div>
+                    )}
+            </div>
+        </>
     )
 }

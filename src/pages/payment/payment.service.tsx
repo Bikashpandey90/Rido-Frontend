@@ -1,0 +1,17 @@
+import HttpService from "@/services/http.service";
+
+class PaymentService extends HttpService {
+
+    async makePaymentConfirmation(data: any, rideId: string) {
+        try {
+            const response = await this.postRequest('/ride/' + rideId + '/payment', data, { auth: true })
+            return response.data;
+
+        } catch (exception) {
+            console.log(exception);
+        }
+    }
+
+}
+const paymentSvc = new PaymentService()
+export default paymentSvc;

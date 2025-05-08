@@ -19,6 +19,8 @@ import MapPage from "@/pages/customer/map/map";
 import RiderPageLayout from "@/pages/rider/layout/layout";
 import CustomerPageLayout from "@/pages/customer/layout/layout";
 import PermissionCheck from "./permission.config";
+import PaymentSuccess from "@/pages/payment/payment-success";
+import PaymentFailure from "@/pages/payment/payment-failure";
 
 
 
@@ -112,6 +114,13 @@ const Routing: FC = () => {
                         {
                             path: 'chat',
                             element: <ChatPage />
+                        }, {
+                            path: 'payment-success',
+                            element: <PaymentSuccess />
+                        },
+                        {
+                            path: 'payment-failed',
+                            element: <PaymentFailure />
                         }
                     ]
                 }

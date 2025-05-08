@@ -68,9 +68,9 @@ export default function MapPage() {
                 <div className="flex-1 relative">
                     {/* Desktop header */}
                     <div className="hidden md:flex items-center justify-between p-4 border-b bg-background/90 backdrop-blur-sm">
-                        <NavLink to="/customer/dashboard" className="flex items-center gap-2">
+                        <NavLink to="/" className="flex items-center gap-2">
                             <ChevronLeft className="h-5 w-5" />
-                            <span>Back to Dashboard</span>
+                            <span>Back to Home</span>
                         </NavLink>
                     </div>
 

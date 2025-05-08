@@ -2,13 +2,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { AuthContext } from "@/context/auth.context"
 import { datify, shortify } from "@/lib/utils"
 import { Review } from "@/pages/review/review-page"
 import reviewSvc from "@/pages/review/review.svc"
 import { RideData } from "@/pages/rides/rides-page"
 import rideSvc from "@/pages/rides/rides.service"
 import { Car, ChevronRight, Star } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
 
 export function ActivityCard() {
@@ -39,6 +40,7 @@ export function ActivityCard() {
         fetchRides()
 
     }, [])
+    const auth = useContext(AuthContext) as { loggedInUser: any }
 
     return (
         <Card className="md:col-span-3 lg:col-span-4 overflow-hidden border-none shadow-md hover:shadow-lg transition-shadow duration-200">
@@ -55,7 +57,7 @@ export function ActivityCard() {
                                 Recent Rides
                             </h3>
                             <Button variant="ghost" size="sm" asChild>
-                                <NavLink to="/rides" className="flex items-center gap-1 text-sm">
+                                <NavLink to={`/${auth.loggedInUser.role}/rides`} className="flex items-center gap-1 text-sm">
                                     See all
                                     <ChevronRight className="h-4 w-4" />
                                 </NavLink>
@@ -99,7 +101,7 @@ export function ActivityCard() {
                                 Your Reviews
                             </h3>
                             <Button variant="ghost" size="sm" asChild>
-                                <NavLink to="/reviews" className="flex items-center gap-1 text-sm">
+                                <NavLink to={`/${auth.loggedInUser.role}/reviews`} className="flex items-center gap-1 text-sm">
                                     See all
                                     <ChevronRight className="h-4 w-4" />
                                 </NavLink>
@@ -147,6 +149,6 @@ export function ActivityCard() {
                     </div>
                 </div>
             </CardContent>
-        </Card>
+        </Card >
     )
 }

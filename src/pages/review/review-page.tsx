@@ -6,7 +6,8 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Calendar, MessageSquare, Star, ThumbsDown, ThumbsUp } from "lucide-react"
 import { NavLink } from "react-router-dom"
 import reviewSvc from "./review.svc"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { AuthContext } from "@/context/auth.context"
 
 export interface Review {
     _id: string,
@@ -47,13 +48,15 @@ export default function ReviewsPage() {
         fetchReviews()
     }, [])
 
+    const auth = useContext(AuthContext) as { loggedInUser: any }
+
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-2 sm:p-4 md:p-6">
             <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
                 <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Button variant="ghost" size="icon" asChild className="h-8 w-8 sm:h-9 sm:w-9">
-                        <NavLink to="/profile">
+                        <NavLink to={`/${auth.loggedInUser.role}/profile`}>
                             <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                             <span className="sr-only">Back to profile</span>
                         </NavLink>

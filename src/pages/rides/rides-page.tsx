@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, Bike, Calendar, Car, Clock, CreditCard, MapPin, Star } from "lucide-react"
-import { useEffect, useState } from "react"
-import { NavLink } from "react-router-dom"
+import { useContext, useEffect, useState } from "react"
+import { NavLink, useNavigate } from "react-router-dom"
 import rideSvc from "./rides.service"
 import { datify, initialify, timefy } from "@/lib/utils"
+import { AuthContext } from "@/context/auth.context"
 
 interface Location {
     type: "Point";
@@ -71,6 +72,9 @@ export default function RidesPage() {
         fetchRides()
 
     }, [])
+    const auth = useContext(AuthContext) as { loggedInUser: any }
+
+    const navigate = useNavigate()
 
 
     return (
@@ -78,7 +82,7 @@ export default function RidesPage() {
             <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
                 <div className="flex items-center gap-2 mb-4 sm:mb-6">
                     <Button variant="ghost" size="icon" asChild className="h-8 w-8 sm:h-9 sm:w-9">
-                        <NavLink to="/profile">
+                        <NavLink to={`/${auth.loggedInUser.role}/profile`}>
                             <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                             <span className="sr-only">Back to profile</span>
                         </NavLink>
@@ -215,7 +219,7 @@ export default function RidesPage() {
                                         variant="outline"
                                         className="text-teal-700 border-teal-200 hover:bg-teal-100 text-xs h-8"
                                     >
-                                        Receipt
+                                        Details
                                     </Button>
                                     <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-xs h-8">
                                         Book Again
@@ -296,9 +300,13 @@ export default function RidesPage() {
                                         </div>
                                         <div className="flex gap-2 w-full sm:w-auto justify-end">
                                             <Button size="sm" variant="outline" className="text-xs h-8">
-                                                Receipt
+                                                Details
                                             </Button>
-                                            <Button size="sm" className="text-xs h-8">
+                                            <Button size="sm" className="text-xs h-8"
+                                                onClick={() => {
+                                                    navigate(`/${auth.loggedInUser.role}`)
+
+                                                }}>
                                                 Book Again
                                             </Button>
                                         </div>

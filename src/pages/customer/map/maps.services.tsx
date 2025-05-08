@@ -1,26 +1,14 @@
 import HttpService from "@/services/http.service";
 
 class MapsService extends HttpService {
-    // async fetchSearchSuggestions(data: string) {
-    //     try {
-
-
-    //     } catch (exception) {
-    //         console.log(exception)
-    //         throw exception
-    //     }
-    // }
-
     async fetchSavedLocations() {
         try {
             const response = await this.getRequest('/misc/get-saved-address', { auth: true })
             return response.data
         } catch (exception) {
-
             throw exception
         }
     }
-
     async createRideRequest(data: any) {
         try {
             const response = await this.postRequest('/ride/request', data, { auth: true })
@@ -30,7 +18,6 @@ class MapsService extends HttpService {
             throw exception
         }
     }
-
     async fetchRecentRidesLocations() {
         try {
             //todo-make this api in backend
@@ -50,7 +37,6 @@ class MapsService extends HttpService {
             throw exception
         }
     }
-
     async fetchRecentRides() {
         try {
             const response = await this.getRequest('/ride/rides', { auth: true })
@@ -60,22 +46,18 @@ class MapsService extends HttpService {
             throw exception
         }
     }
-
     async acceptRide(data: any) {
         try {
             const response = await this.patchRequest('/ride/accept-ride', data, { auth: true })
             return response.data
-
         } catch (exception) {
             throw exception
         }
     }
-
     async getRideDetail(rideId: string) {
         try {
             const response = await this.getRequest(`/ride/${rideId}`, { auth: true })
             return response.data
-
         }
         catch (exception) {
             throw exception
@@ -102,8 +84,7 @@ class MapsService extends HttpService {
             throw exception
         }
     }
-
-    async deleteSavedLocationById(id: string) {
+    async deleteSavedLocationById(id: String) {
         try {
             const response = await this.deleteRequest(`/misc/${id}`, { auth: true })
             return response.data
@@ -117,6 +98,14 @@ class MapsService extends HttpService {
             const response = await this.postRequest('/misc/save-address', data, { auth: true })
             return response.data
 
+        } catch (exception) {
+            throw exception
+        }
+    }
+    async updateSavedLocationsDetails(data: any, id: string) {
+        try {
+            const response = await this.patchRequest(`/misc/${id}`, data, { auth: true })
+            return response.data
         } catch (exception) {
             throw exception
         }

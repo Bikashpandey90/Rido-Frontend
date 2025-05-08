@@ -30,7 +30,7 @@ export default function Home() {
 
                                     <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => {
                                         if (auth.loggedInUser) {
-                                            navigate('/ride')
+                                            navigate(`/${auth.loggedInUser.role}`)
                                         } else {
                                             navigate('/login')
                                         }

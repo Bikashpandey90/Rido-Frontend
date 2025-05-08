@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom"
 const CustomerPageLayout = () => {
     return (<>
 
-        <div className="flex min-h-screen flex-col ">
+        <div className="flex min-h-screen flex-col  ">
             <Outlet />
         </div>
     </>)

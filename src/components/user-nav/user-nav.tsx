@@ -57,7 +57,7 @@ export function UserNav() {
                         <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => {
-                        navigate(`/${auth.loggedInUser.role}/chats`)
+                        navigate(`/${auth.loggedInUser.role}/chat`)
 
                     }}>
                         Chats
@@ -69,7 +69,10 @@ export function UserNav() {
                         Settings
                         <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>New Team</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                        navigate(`/${auth.loggedInUser.role}/rides`)
+
+                    }}>Your rides</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => {
