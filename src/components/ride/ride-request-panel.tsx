@@ -1,4 +1,4 @@
-"use client"
+
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -423,13 +423,17 @@ export default function RideRequestPanel({
             console.log(exception)
         }
     }
-    const updateSavedLocations = async (data: any, title: string) => {
+    const updateSavedLocations = async (id: string, title: string) => {
         try {
             let payload = {
-
+                title: title
             }
-            const response = await mapsSvc.updateSavedLocationsDetails(payload)
-            
+            const response = await mapsSvc.updateSavedLocationsDetails(payload, id)
+            console.log(response.detail)
+            if (response?.status === 'ADDRESS_UPDATED') {
+                getSavedLocations()
+            }
+
 
         } catch (exception) {
             console.log(exception)
@@ -1013,7 +1017,7 @@ export default function RideRequestPanel({
                                                                         <DropdownMenuItem
                                                                             onClick={() => {
                                                                                 console.log("Home clicked")
-                                                                                saveLocations(location, "home")
+                                                                                updateSavedLocations(location._id, "home")
                                                                             }}
                                                                         >
                                                                             <Home className="h-4 w-4 mr-2" />
@@ -1022,7 +1026,7 @@ export default function RideRequestPanel({
                                                                         <DropdownMenuItem
                                                                             onClick={() => {
                                                                                 console.log("Work clicked")
-                                                                                saveLocations(location, "work")
+                                                                                updateSavedLocations(location._id, "work")
                                                                             }}
                                                                         >
                                                                             <Briefcase className="h-4 w-4 mr-2" />
@@ -1031,7 +1035,7 @@ export default function RideRequestPanel({
                                                                         <DropdownMenuItem
                                                                             onClick={() => {
                                                                                 console.log("Others clicked")
-                                                                                saveLocations(location, "other")
+                                                                                updateSavedLocations(location._id, "other")
                                                                             }}
                                                                         >
                                                                             <ListPlus className="h-4 w-4 mr-2" />
@@ -1041,7 +1045,7 @@ export default function RideRequestPanel({
                                                                         <DropdownMenuItem
                                                                             onClick={() => {
                                                                                 console.log("Recent clicked")
-                                                                                saveLocations(location, "recent")
+                                                                                updateSavedLocations(location._id, "recent")
                                                                             }}
                                                                         >
                                                                             <Clock className="h-4 w-4 mr-2" />

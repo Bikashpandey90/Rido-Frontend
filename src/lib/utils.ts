@@ -51,3 +51,7 @@ export function initialify(name: string) {
     .toUpperCase()
 
 }
+
+export function capitalify(name: string) {
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}

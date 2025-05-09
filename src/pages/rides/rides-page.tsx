@@ -218,6 +218,7 @@ export default function RidesPage() {
                                         size="sm"
                                         variant="outline"
                                         className="text-teal-700 border-teal-200 hover:bg-teal-100 text-xs h-8"
+
                                     >
                                         Details
                                     </Button>
@@ -299,7 +300,10 @@ export default function RidesPage() {
                                             </div>
                                         </div>
                                         <div className="flex gap-2 w-full sm:w-auto justify-end">
-                                            <Button size="sm" variant="outline" className="text-xs h-8">
+                                            <Button size="sm" variant="outline" className="text-xs h-8"
+                                                onClick={() => {
+                                                    navigate('/' + auth.loggedInUser.role + '/ride-detail/' + ride?._id)
+                                                }}>
                                                 Details
                                             </Button>
                                             <Button size="sm" className="text-xs h-8"

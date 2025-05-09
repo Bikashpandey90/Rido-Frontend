@@ -6,7 +6,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { Label } from "@/components/ui/label"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as Yup from "yup"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import authSvc, { UserType } from "./auth.service"
 import { InputType, TextInputField } from "@/components/form/input.field"
 import { useForm } from "react-hook-form"
@@ -36,6 +36,8 @@ const Login = () => {
     })
 
 
+
+
     const { control, handleSubmit, formState: { errors } } = useForm({ resolver: yupResolver(LoginDTO) })
 
 
@@ -50,7 +52,7 @@ const Login = () => {
             let response: UserType = await authSvc.loginApi(payload)
             setLoggedInUser(response)
 
-            
+
             navigate(`/${loggedInUser.role}/ride`)
 
             // toast.success("Login sucess")
@@ -84,7 +86,15 @@ const Login = () => {
             setLoading(false)
         }
 
+
     }
+    const auth = useContext(AuthContext) as { loggedInUser: any }
+
+    useEffect(() => {
+        if (auth.loggedInUser) {
+            navigate(`/${auth.loggedInUser.role}`)
+        }
+    }, [])
 
 
 

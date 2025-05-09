@@ -6,8 +6,7 @@ import NotFound from "@/pages/not-found/not-found";
 import HomePageLayout from "@/pages/homepage/homepage-layout";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
-import CustomerDashboard from "@/pages/customer/dashboard/dashboard";
-import RiderDashboard from "@/pages/rider/dashboard/dashboard";
+
 
 import ProfilePage from "@/pages/customer/profile/profile";
 import RiderProfile from "@/pages/rider/profile/profile";
@@ -21,6 +20,7 @@ import CustomerPageLayout from "@/pages/customer/layout/layout";
 import PermissionCheck from "./permission.config";
 import PaymentSuccess from "@/pages/payment/payment-success";
 import PaymentFailure from "@/pages/payment/payment-failure";
+import RideDetailPage from "@/pages/rides/ride-detail";
 
 
 
@@ -97,7 +97,6 @@ const Routing: FC = () => {
                             element: <NotFound />
 
                         },
-
                         {
                             path: 'profile',
                             element: <ProfilePage />
@@ -110,6 +109,10 @@ const Routing: FC = () => {
                         {
                             path: 'rides',
                             element: <RidesPage />
+                        }, {
+                            path: 'ride-detail/:id',
+                            element: <RideDetailPage />
+
                         },
                         {
                             path: 'chat',

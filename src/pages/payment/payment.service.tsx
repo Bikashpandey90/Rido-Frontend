@@ -4,7 +4,7 @@ class PaymentService extends HttpService {
 
     async makePaymentConfirmation(data: any, rideId: string) {
         try {
-            const response = await this.postRequest('/ride/' + rideId + '/payment', data, { auth: true })
+            const response = await this.postRequest('/ride/payment/' + rideId , data, { auth: true })
             return response.data;
 
         } catch (exception) {

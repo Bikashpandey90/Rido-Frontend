@@ -15,6 +15,7 @@ interface MapViewProps {
     showRoute: boolean
     setRouteInfo: (info: any) => void
     setShowDirectionsCard: (show: boolean) => void
+    className?: string
 }
 
 // Custom user location marker component
@@ -209,6 +210,7 @@ export default function MapView({
     showRoute,
     setRouteInfo,
     setShowDirectionsCard,
+    className
 }: MapViewProps) {
     // Default marker position
     const markers = {
@@ -240,10 +242,10 @@ export default function MapView({
     }, [])
 
     return (
-        <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-65px)] relative">
+        <div className={`h-[calc(100vh-64px)] md:h-[calc(100vh-65px)] relative z-0 ${className}`} >
             <MapContainer
                 center={markers.geocode}
-                zoom={13}
+                zoom={15}
                 scrollWheelZoom={true}
                 style={{ height: "100%", width: "100%" }}
                 zoomControl={false}
@@ -251,6 +253,7 @@ export default function MapView({
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=7bc8f939ae3246b29e516ccf0e07c43d"
+                    className="-z-0"
                 />
                 <MapUpdater center={markers.geocode} />
 
@@ -270,6 +273,6 @@ export default function MapView({
                 {/* Map controls */}
                 <MapControls />
             </MapContainer>
-        </div>
+        </div >
     )
 }

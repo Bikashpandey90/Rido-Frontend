@@ -181,11 +181,11 @@ export default function PaymentSuccess() {
                                     navigate('/admin/order-detail/' + decodeData.transaction_uuid)
                                 }
                                 if (auth.loggedInUser.role === 'customer') {
-                                    navigate('/ride-detail/' + decodeData.transaction_uuid)
+                                    navigate('/customer/ride-detail/' + decodeData.transaction_uuid)
                                 }
                             }}
                         >
-                            View Ride Details
+                            Continue
                         </Button>
                         <Button variant="outline" className="w-full text-sm sm:text-base py-2" onClick={() => {
                             navigate('/')
