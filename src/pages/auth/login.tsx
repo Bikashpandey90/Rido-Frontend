@@ -53,7 +53,8 @@ const Login = () => {
             setLoggedInUser(response)
 
 
-            navigate(`/${loggedInUser.role}/ride`)
+            navigate(`/${response?.role}`)
+
 
             // toast.success("Login sucess")
         } catch (exception) {
@@ -75,9 +76,10 @@ const Login = () => {
 
             }
             let response: UserType = await authSvc.RiderLoginApi(payload)
+            console.log(response)
             setLoggedInUser(response)
 
-            navigate(`/${loggedInUser.role}/ride`)
+            navigate(`/${response?.role}`)
             // toast.success("Login sucess")
         } catch (exception) {
             console.log(exception)

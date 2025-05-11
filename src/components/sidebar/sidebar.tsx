@@ -8,7 +8,10 @@ export interface User {
     name: string,
     email: string,
     image: string,
-    role?: string
+    role?: string,
+    status?: 'active' | 'inactive',
+    createdAt?: string,
+    updatedAt?: string
 }
 interface UserSidebarProps {
     onSelectUser: (user: User) => void

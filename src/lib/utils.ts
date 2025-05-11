@@ -43,6 +43,11 @@ export function shortify(address: string, len: number = 2) {
   const Address = address.split(',').slice(0, len).join(' ')
   return Address
 }
+export function shortifyTwo(address: string, len: number = 2) {
+  const Address = address.split(' ').slice(0, len).join(' ')
+  return Address
+}
+
 export function initialify(name: string) {
   return name
     ?.split(" ")

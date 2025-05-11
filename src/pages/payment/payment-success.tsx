@@ -65,7 +65,7 @@ export default function PaymentSuccess() {
 
             const payload = {
                 "amount": amountValue,  // Ensure it's a number
-                "method": "esewa",
+                "paymentMethod": "esewa",
                 "transactionCode": decodeData.transaction_uuid,
                 "data": JSON.stringify(decodeData)
             }

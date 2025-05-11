@@ -4,10 +4,12 @@ import { createContext, useEffect, useState } from "react";
 
 export const AuthContext = createContext({})
 
+
 export const AuthProvider = ({ children }: Readonly<{ children: React.ReactNode }>) => {
 
     const [data, setData] = useState<any>()
     const [loading, setLoading] = useState(true)
+    // const navigate = useNavigate()
 
 
     const getLoggedInUser = async () => {
@@ -20,9 +22,11 @@ export const AuthProvider = ({ children }: Readonly<{ children: React.ReactNode 
                         'Authorization': "Bearer " + localStorage.getItem('token'),
                     }
                 }) as any
-
-
+                if (response.data?.status === 'TOKEN_EXPIRED') {
+                    // window.location.href = '/login';
+                }
                 setData(response.data.detail)
+
 
             }
             console.log(loading)

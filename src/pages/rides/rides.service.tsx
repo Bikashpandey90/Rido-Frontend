@@ -19,6 +19,15 @@ class RideService extends HttpService {
             throw exception
         }
     }
+    fetchRiders = async () => {
+        try {
+            const response = await this.getRequest('/auth/list-riders', { auth: true })
+            return response.data
+
+        } catch (exception) {
+            throw exception
+        }
+    }
 
 }
 const rideSvc = new RideService()

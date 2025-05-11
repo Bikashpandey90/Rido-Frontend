@@ -6,8 +6,6 @@ import NotFound from "@/pages/not-found/not-found";
 import HomePageLayout from "@/pages/homepage/homepage-layout";
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
-
-
 import ProfilePage from "@/pages/customer/profile/profile";
 import RiderProfile from "@/pages/rider/profile/profile";
 import RiderPage from "@/pages/rider/rider-map/rider-map";
@@ -21,6 +19,20 @@ import PermissionCheck from "./permission.config";
 import PaymentSuccess from "@/pages/payment/payment-success";
 import PaymentFailure from "@/pages/payment/payment-failure";
 import RideDetailPage from "@/pages/rides/ride-detail";
+import Dashboard from "@/pages/admin/layout/layout";
+import AdminDashBoard from "@/pages/admin/dashboard/dashboard";
+import DriversPage from "@/pages/admin/riders/riders";
+import CustomerPage from "@/pages/admin/customers/customers";
+import AdminRidesPage from "@/pages/admin/rides/rides";
+import PaymentsPage from "@/pages/admin/payments/payment";
+import SettingsPage from "@/pages/admin/settings/settings";
+import MapsPage from "@/pages/admin/maps/maps";
+import ReviewPage from "@/pages/admin/reviews/reviews";
+import OffersVouchersPage from "@/pages/admin/offers/offers";
+import OfferDetailsPage from "@/pages/admin/offers/offer-details";
+import UpdateOfferPage from "@/pages/admin/offers/update-offer";
+import AdminChatPage from "@/pages/admin/chats/chats";
+
 
 
 
@@ -129,6 +141,56 @@ const Routing: FC = () => {
                 }
             ]
         }
+        , {
+            path: '/admin',
+            element: <PermissionCheck allowedRole="admin">
+                <Dashboard />
+            </PermissionCheck>,
+
+            children: [
+                {
+                    index: true,
+                    element: <AdminDashBoard />
+                }, {
+                    path: 'riders',
+                    element: <DriversPage />
+                },
+                {
+                    path: 'customers',
+                    element: <CustomerPage />
+                }, {
+                    path: 'rides',
+                    element: <AdminRidesPage />
+
+                }, {
+                    path: 'payments',
+                    element: <PaymentsPage />
+                }, {
+                    path: 'chats',
+                    element: <AdminChatPage />
+
+                }, {
+                    path: 'settings',
+                    element: <SettingsPage />
+                }, {
+                    path: 'map',
+                    element: <MapsPage />
+                },
+                {
+                    path: 'reviews',
+                    element: <ReviewPage />
+                }, {
+                    path: 'offers',
+                    element: <OffersVouchersPage />
+                }, {
+                    path: 'offers/details/:id',
+                    element: <OfferDetailsPage />
+                }, {
+                    path: 'offers/update/:id',
+                    element: <UpdateOfferPage />
+                }
+            ]
+        }
 
     ])
 
@@ -137,9 +199,6 @@ const Routing: FC = () => {
 
     return <>
         <QueryClientProvider client={queryClient}>
-
-
-
             <RouterProvider router={router} />
         </QueryClientProvider>
     </>

@@ -26,7 +26,7 @@ interface Rider {
     _id: string;
     name: string;
     email: string;
-    image: string;
+    image?: string;
 }
 
 export interface RideData {
@@ -34,7 +34,7 @@ export interface RideData {
     dropOffLocation: Location;
     vehicleDetails: VehicleDetails;
     _id: string;
-    userId: string;
+    userId: Rider;
     fare: number;
     distance: number;
     distanceTime: number;

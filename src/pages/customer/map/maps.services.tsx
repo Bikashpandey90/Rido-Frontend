@@ -72,12 +72,12 @@ class MapsService extends HttpService {
             throw exception
         }
     }
-    async makePayment(rideId: string, method: string, amount: number) {
+    async makePayment(rideId: string, paymentMethod: string, amount: number) {
         try {
 
             const transactionCode = `${Date.now()}${Math.floor(1000 + Math.random() * 9000)}`;
 
-            const response = await this.postRequest(`/ride/payment/${rideId}`, { method, amount, transactionCode }, { auth: true })
+            const response = await this.postRequest(`/ride/payment/${rideId}`, { paymentMethod, amount, transactionCode }, { auth: true })
             return response.data
 
         } catch (exception) {
