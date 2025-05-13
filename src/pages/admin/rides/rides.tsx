@@ -15,6 +15,7 @@ import rideSvc from "@/pages/rides/rides.service"
 import { useEffect, useState } from "react"
 import { RideData } from "@/pages/rides/rides-page"
 import { capitalify, datify, initialify, timefy } from "@/lib/utils"
+import { useNavigate } from "react-router-dom"
 
 const AdminRidesPage = () => {
 
@@ -37,134 +38,8 @@ const AdminRidesPage = () => {
 
 
 
-    // const rides = [
-    //     {
-    //         id: "RID-7829",
-    //         passenger: {
-    //             name: "Emma Thompson",
-    //             avatar: "ET",
-    //         },
-    //         driver: {
-    //             name: "Alex Johnson",
-    //             avatar: "AJ",
-    //         },
-    //         pickup: "Downtown Financial District",
-    //         dropoff: "International Airport Terminal 2",
-    //         date: "Today",
-    //         time: "10:30 AM",
-    //         duration: "35 min",
-    //         distance: "18.5 mi",
-    //         amount: 42.75,
-    //         status: "Completed",
-    //         paymentStatus: "Paid",
-    //         type: "Premium",
-    //     },
-    //     {
-    //         id: "RID-7830",
-    //         passenger: {
-    //             name: "Michael Davis",
-    //             avatar: "MD",
-    //         },
-    //         driver: {
-    //             name: "Maria Garcia",
-    //             avatar: "MG",
-    //         },
-    //         pickup: "Westside Mall",
-    //         dropoff: "Riverside Apartments",
-    //         date: "Today",
-    //         time: "11:45 AM",
-    //         duration: "22 min",
-    //         distance: "8.2 mi",
-    //         amount: 24.5,
-    //         status: "In Progress",
-    //         paymentStatus: "Pending",
-    //         type: "Economy",
-    //     },
-    //     {
-    //         id: "RID-7831",
-    //         passenger: {
-    //             name: "Sophia Martinez",
-    //             avatar: "SM",
-    //         },
-    //         driver: {
-    //             name: "Robert Chen",
-    //             avatar: "RC",
-    //         },
-    //         pickup: "Central Park South",
-    //         dropoff: "Harbor Heights Hotel",
-    //         date: "Today",
-    //         time: "09:15 AM",
-    //         duration: "18 min",
-    //         distance: "5.7 mi",
-    //         amount: 18.9,
-    //         status: "Completed",
-    //         paymentStatus: "Paid",
-    //         type: "Economy",
-    //     },
-    //     {
-    //         id: "RID-7832",
-    //         passenger: {
-    //             name: "Daniel Johnson",
-    //             avatar: "DJ",
-    //         },
-    //         driver: {
-    //             name: "Priya Patel",
-    //             avatar: "PP",
-    //         },
-    //         pickup: "Tech District Office Park",
-    //         dropoff: "Parkview Residence",
-    //         date: "Yesterday",
-    //         time: "05:30 PM",
-    //         duration: "25 min",
-    //         distance: "10.3 mi",
-    //         amount: 32.4,
-    //         status: "Cancelled",
-    //         paymentStatus: "Refunded",
-    //         type: "Premium",
-    //     },
-    //     {
-    //         id: "RID-7833",
-    //         passenger: {
-    //             name: "Olivia Wilson",
-    //             avatar: "OW",
-    //         },
-    //         driver: {
-    //             name: "James Wilson",
-    //             avatar: "JW",
-    //         },
-    //         pickup: "Meadow Gardens Community",
-    //         dropoff: "City Center Plaza",
-    //         date: "Yesterday",
-    //         time: "02:15 PM",
-    //         duration: "30 min",
-    //         distance: "12.8 mi",
-    //         amount: 35.6,
-    //         status: "Completed",
-    //         paymentStatus: "Paid",
-    //         type: "Luxury",
-    //     },
-    //     {
-    //         id: "RID-7834",
-    //         passenger: {
-    //             name: "William Brown",
-    //             avatar: "WB",
-    //         },
-    //         driver: {
-    //             name: "Sofia Rodriguez",
-    //             avatar: "SR",
-    //         },
-    //         pickup: "University Campus",
-    //         dropoff: "Northside Apartments",
-    //         date: "Yesterday",
-    //         time: "11:20 AM",
-    //         duration: "15 min",
-    //         distance: "4.5 mi",
-    //         amount: 15.8,
-    //         status: "Scheduled",
-    //         paymentStatus: "Not Paid",
-    //         type: "Economy",
-    //     },
-    // ]
+
+    const navigate = useNavigate()
 
     return (
         <>
@@ -334,7 +209,11 @@ const AdminRidesPage = () => {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() => {
+                                                                navigate('detail/' + ride._id)
+
+                                                            }}>View Details</DropdownMenuItem>
                                                         <DropdownMenuItem>Track Ride</DropdownMenuItem>
                                                         <DropdownMenuItem>Contact Driver</DropdownMenuItem>
                                                         <DropdownMenuItem>Contact Passenger</DropdownMenuItem>

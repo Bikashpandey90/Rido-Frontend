@@ -10,8 +10,6 @@ export const AuthProvider = ({ children }: Readonly<{ children: React.ReactNode 
     const [data, setData] = useState<any>()
     const [loading, setLoading] = useState(true)
     // const navigate = useNavigate()
-
-
     const getLoggedInUser = async () => {
         try {
 
@@ -72,8 +70,6 @@ export const AuthProvider = ({ children }: Readonly<{ children: React.ReactNode 
     useEffect(() => {
         getLoggedInUser()
     }, [])
-
-
     return (<>
         <AuthContext.Provider value={{ loggedInUser: data || null, setLoggedInUser: setData }}>
             {
@@ -82,6 +78,4 @@ export const AuthProvider = ({ children }: Readonly<{ children: React.ReactNode 
 
         </AuthContext.Provider>
     </>)
-
-
 }

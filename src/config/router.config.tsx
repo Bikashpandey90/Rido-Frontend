@@ -32,6 +32,12 @@ import OffersVouchersPage from "@/pages/admin/offers/offers";
 import OfferDetailsPage from "@/pages/admin/offers/offer-details";
 import UpdateOfferPage from "@/pages/admin/offers/update-offer";
 import AdminChatPage from "@/pages/admin/chats/chats";
+import PaymentDetailsPage from "@/pages/admin/payments/payments.detail";
+import AdminRideDetailsPage from "@/pages/admin/rides/rides.detail";
+import DriverProfilePage from "@/pages/admin/riders/riders.profile";
+import AdminDriverInfoPage from "@/pages/admin/customers/customers.profile";
+import AdminUserInfoPage from "@/pages/admin/customers/customers.profile";
+import LandingPage, { NavbarDemo } from "@/pages/landing-page/page";
 
 
 
@@ -154,18 +160,34 @@ const Routing: FC = () => {
                 }, {
                     path: 'riders',
                     element: <DriversPage />
+                }, {
+                    path: 'riders/profile',
+                    element: <AdminDriverInfoPage />
+
                 },
                 {
                     path: 'customers',
                     element: <CustomerPage />
                 }, {
+                    path: 'customers/profile/:id',
+                    element: <AdminUserInfoPage />
+
+                }, {
                     path: 'rides',
                     element: <AdminRidesPage />
+
+                }, {
+                    path: 'rides/detail/:id',
+                    element: <AdminRideDetailsPage />
 
                 }, {
                     path: 'payments',
                     element: <PaymentsPage />
                 }, {
+                    path: 'payments/details/:id',
+                    element: <PaymentDetailsPage />
+                }
+                , {
                     path: 'chats',
                     element: <AdminChatPage />
 
@@ -190,6 +212,10 @@ const Routing: FC = () => {
                     element: <UpdateOfferPage />
                 }
             ]
+        }, {
+            path: '/landing',
+            element: <NavbarDemo />
+
         }
 
     ])

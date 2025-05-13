@@ -20,6 +20,7 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YA
 import { useEffect, useState } from "react"
 import paymentSvc from "@/pages/payment/payment.service"
 import { capitalify, datify, initialify, timefy } from "@/lib/utils"
+import { useNavigate } from "react-router-dom"
 
 export interface Payment {
     _id: string;
@@ -94,6 +95,8 @@ export default function PaymentsPage() {
     useEffect(() => {
         fetchPayments()
     }, [])
+
+    const navigate = useNavigate()
 
     return (
         <>
@@ -381,7 +384,11 @@ export default function PaymentsPage() {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                                                        <DropdownMenuItem
+                                                            onClick={() => [
+                                                                navigate('details/' + transaction._id)
+                                                            ]}
+                                                        >View Details</DropdownMenuItem>
                                                         <DropdownMenuItem>Download Receipt</DropdownMenuItem>
                                                         {/* {transaction.status === "processing" && (
                                                             <DropdownMenuItem>Expedite Processing</DropdownMenuItem>

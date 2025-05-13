@@ -24,9 +24,8 @@ const PermissionCheck = ({ allowedRole, children }: PermissionCheckProps) => {
     } else {
         // toast.warning("Please login to access !")
         return
-        <>
-            <Navigate to={'/login'} />
-        </>
+        <><Navigate to={'/login'} /></>
+
     }
 
 

@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 import chatSvc from "@/pages/chat/chat.svc"
 import { User } from "@/components/sidebar/sidebar"
 import { capitalify, datify } from "@/lib/utils"
+import { useNavigate } from "react-router-dom"
 
 
 const CustomerPage = () => {
@@ -32,6 +33,8 @@ const CustomerPage = () => {
     useEffect(() => {
         fetchPassengers()
     }, [])
+
+    const navigate = useNavigate()
 
 
 
@@ -167,7 +170,12 @@ const CustomerPage = () => {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>View Profile</DropdownMenuItem>
+                                                    <DropdownMenuItem
+                                                        onClick={() => {
+                                                            navigate('profile/' + passenger._id)
+
+                                                        }}
+                                                    >View Profile</DropdownMenuItem>
                                                     <DropdownMenuItem>Ride History</DropdownMenuItem>
                                                     <DropdownMenuItem>Payment History</DropdownMenuItem>
                                                     <DropdownMenuItem>Send Message</DropdownMenuItem>

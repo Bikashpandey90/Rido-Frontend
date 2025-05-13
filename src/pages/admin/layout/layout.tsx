@@ -1,7 +1,7 @@
-
 import { useContext, useState } from "react"
 import {
     Bell,
+    Bike,
     Car,
     CreditCard,
     LayoutDashboard,
@@ -25,11 +25,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from "@/components/ui/input"
 
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
-import { initialify } from "@/lib/utils"
+import { capitalify, initialify } from "@/lib/utils"
 import { AuthContext } from "@/context/auth.context"
+import { ThemeToggle } from "@/components/theme-toggle/theme"
 
 export default function Dashboard() {
-    const { theme, setTheme } = useTheme()
+    // const { theme, setTheme } = useTheme()
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     // In the toggleSidebar function, update to not automatically open on mobile
@@ -39,6 +40,11 @@ export default function Dashboard() {
 
     const auth = useContext(AuthContext) as { loggedInUser: any }
     const navigate = useNavigate()
+
+    // const [isSelected, setIsSelected] = useState(false)
+
+    const { setLoggedInUser } = useContext(AuthContext) as { setLoggedInUser: Function }
+
 
 
 
@@ -112,7 +118,7 @@ export default function Dashboard() {
                                 asChild
                             >
                                 <NavLink to="rides">
-                                    <Car className={`w-5 h-5 ${isSidebarOpen ? "mr-2" : ""}`} />
+                                    <Bike className={`w-5 h-5 ${isSidebarOpen ? "mr-2" : ""}`} />
                                     {isSidebarOpen && <span>Rides</span>}
                                 </NavLink>
                             </Button>
@@ -187,8 +193,8 @@ export default function Dashboard() {
                         </Avatar>
                         {isSidebarOpen && (
                             <div className="ml-3">
-                                <p className="text-sm font-medium">John Doe</p>
-                                <p className="text-xs text-muted-foreground">Admin</p>
+                                <p className="text-sm font-medium">{auth.loggedInUser.name}</p>
+                                <p className="text-xs text-muted-foreground">{capitalify(auth.loggedInUser.role)}</p>
                             </div>
                         )}
                     </div>
@@ -218,9 +224,10 @@ export default function Dashboard() {
                             />
                         </div>
                         <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+                            {/* <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
                                 {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-                            </Button>
+                            </Button> */}
+                            <ThemeToggle/>
                             <Button variant="ghost" size="icon" className="relative">
                                 <Bell className="h-5 w-5" />
                                 <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-medium text-white">
@@ -240,8 +247,21 @@ export default function Dashboard() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem>Profile</DropdownMenuItem>
-                                    <DropdownMenuItem>Settings</DropdownMenuItem>
-                                    <DropdownMenuItem>Logout</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            navigate('settings')
+                                        }}
+                                    >Settings</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => {
+                                            localStorage.removeItem('token');
+                                            localStorage.removeItem('refToken');
+                                            auth.loggedInUser = null
+                                            setLoggedInUser(null);
+                                            navigate('/');
+
+                                        }}
+                                    >Logout</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>

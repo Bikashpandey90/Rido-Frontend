@@ -2,7 +2,6 @@ import ChatContainer from "@/components/chat/chatContainer"
 import NoChatSelected from "@/components/chat/nochatselected"
 import Sidebar, { User } from "@/components/sidebar/sidebar"
 import { useState } from "react"
-
 const AdminChatPage = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
     return (<>

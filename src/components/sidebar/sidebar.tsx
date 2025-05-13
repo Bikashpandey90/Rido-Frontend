@@ -11,7 +11,9 @@ export interface User {
     role?: string,
     status?: 'active' | 'inactive',
     createdAt?: string,
-    updatedAt?: string
+    updatedAt?: string,
+    address?: string,
+    phone: string
 }
 interface UserSidebarProps {
     onSelectUser: (user: User) => void

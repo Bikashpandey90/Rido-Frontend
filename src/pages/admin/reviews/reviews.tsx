@@ -320,7 +320,7 @@ export default function ReviewPage() {
                                                     </div>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <div className="flex">{renderStars(review.rating)}</div>
-                                                        <span className="text-sm text-muted-foreground">for ride #{review?.ride?._id}</span>
+                                                        <span className="text-sm text-muted-foreground">for ride #{review?.ride?._id.slice(-4)}</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center text-sm text-muted-foreground">

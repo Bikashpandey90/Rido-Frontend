@@ -20,6 +20,16 @@ class PaymentService extends HttpService {
             console.log(exception);
         }
     }
+    async getPaymentDetails(id: string) {
+        try {
+            const response = await this.getRequest('/ride/payment/detail/' + id, { auth: true })
+            return response.data;
+
+        } catch (exception) {
+            console.log(exception);
+            throw exception
+        }
+    }
 
 }
 const paymentSvc = new PaymentService()

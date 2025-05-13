@@ -100,6 +100,15 @@ class AuthService extends HttpService {
             console.error(exception)
         }
     }
+    getUserDetails = async (id: string) => {
+        try {
+            const response = await this.getRequest('/auth/user-detail/' + id, { auth: true })
+            return response.data
+
+        } catch (exception) {
+            console.error(exception)
+        }
+    }
 
 }
 const authSvc = new AuthService()
