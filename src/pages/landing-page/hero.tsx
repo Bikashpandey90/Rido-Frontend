@@ -1,3 +1,4 @@
+import RippleButton from "@/components/button/ripple-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
@@ -40,6 +41,7 @@ const Hero = () => {
                             <Button size="lg" className=" bg-blue-600 hover:bg-blue-700 text-white  xs:w-auto">
                                 Book a Ride
                             </Button>
+                            {/* <RippleButton>Book a ride</RippleButton> */}
                             <Button size="lg" variant="outline" className="border-blue-200 dark:border-blue-800 xs:w-auto">
                                 Become a Driver
                             </Button>

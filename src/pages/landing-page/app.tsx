@@ -60,11 +60,11 @@ const AppDownload = () => {
                         </div>
                         <div className="flex  xs:flex-row gap-4 pt-4 text-sm justify-center lg:justify-start">
                             <div className="flex items-center justify-center lg:justify-start">
-                                <Star className="h-4 w-4 sm:h-5 sm:w-5 mr-1 text-yellow-300" />
+                                <Star className="h-4 w-4 sm:h-5 sm:w-5 mr-1 fill-yellow-300 text-yellow-300" />
                                 <span className="text-white/80">4.8/5 on App Store</span>
                             </div>
                             <div className="flex items-center justify-center lg:justify-start">
-                                <Star className="h-4 w-4 sm:h-5 sm:w-5 mr-1 text-yellow-300" />
+                                <Star className="h-4 w-4 sm:h-5 sm:w-5 mr-1 fill-yellow-300 text-yellow-300" />
                                 <span className="text-white/80">4.7/5 on Google Play</span>
                             </div>
                         </div>
