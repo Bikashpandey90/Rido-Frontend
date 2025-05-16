@@ -41,6 +41,7 @@ export default function RiderStatusPanel({
 }: RiderStatusPanelProps) {
 
     const [isOnlineState, setIsOnlineState] = useState(false)
+    console.log(isOnlineState)
 
     const updateStatus = async (availableStatus: boolean) => {
         try {

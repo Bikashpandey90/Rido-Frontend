@@ -300,13 +300,13 @@ export default function MapView({
                 {/* Custom markers for pickup and destination */}
                 {userLocation && (
                     <L.Marker position={userLocation} icon={pickupIcon}>
-                        <L.Popup>Pickup Location</L.Popup>
+                        {/* <L.Popup>Pickup Location</L.Popup> */}
                     </L.Marker>
                 )}
 
                 {destination && (
                     <L.Marker position={destination} icon={destinationIcon}>
-                        <L.Popup>Destination</L.Popup>
+                        {/* <L.Popup>Destination</L.Popup> */}
                     </L.Marker>
                 )}
 

@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-le
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
 import "leaflet-routing-machine"
-import { Locate, Navigation, Plus, Minus, Layers } from "lucide-react"
+import { Locate, Plus, Minus, Layers } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface MapViewProps {
@@ -117,32 +117,32 @@ function MapUpdater({ center }: { center: [number, number] }) {
 }
 
 // Directions card component
-function DirectionsCard({ routeInfo }: { routeInfo: any }) {
-    if (!routeInfo) return null
+// function DirectionsCard({ routeInfo }: { routeInfo: any }) {
+//     if (!routeInfo) return null
 
-    return (
-        <div className="absolute bottom-24 left-4 z-[1000] w-80 bg-white rounded-lg shadow-lg p-4">
-            <div className="text-base font-medium flex items-center mb-2">
-                <Navigation className="h-4 w-4 mr-2" />
-                Route Information
-            </div>
-            <div className="space-y-2">
-                <div className="flex justify-between">
-                    <span className="text-sm font-medium">Distance:</span>
-                    <span className="text-sm">
-                        {routeInfo.distance ? `${(routeInfo.distance / 1000).toFixed(1)} km` : "Calculating..."}
-                    </span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-sm font-medium">Duration:</span>
-                    <span className="text-sm">
-                        {routeInfo.duration ? `${Math.round(routeInfo.duration / 60)} min` : "Calculating..."}
-                    </span>
-                </div>
-            </div>
-        </div>
-    )
-}
+//     return (
+//         <div className="absolute bottom-24 left-4 z-[1000] w-80 bg-white rounded-lg shadow-lg p-4">
+//             <div className="text-base font-medium flex items-center mb-2">
+//                 <Navigation className="h-4 w-4 mr-2" />
+//                 Route Information
+//             </div>
+//             <div className="space-y-2">
+//                 <div className="flex justify-between">
+//                     <span className="text-sm font-medium">Distance:</span>
+//                     <span className="text-sm">
+//                         {routeInfo.distance ? `${(routeInfo.distance / 1000).toFixed(1)} km` : "Calculating..."}
+//                     </span>
+//                 </div>
+//                 <div className="flex justify-between">
+//                     <span className="text-sm font-medium">Duration:</span>
+//                     <span className="text-sm">
+//                         {routeInfo.duration ? `${Math.round(routeInfo.duration / 60)} min` : "Calculating..."}
+//                     </span>
+//                 </div>
+//             </div>
+//         </div>
+//     )
+// }
 
 // Custom routing control component
 function RoutingMachine({ waypoints, setRouteInfo }: { waypoints: L.LatLng[]; setRouteInfo: (info: any) => void }) {

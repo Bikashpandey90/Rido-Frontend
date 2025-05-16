@@ -27,7 +27,7 @@ const ChatContainer = ({ user }: ChatViewProps) => {
 
 
     const [messages, setMessages] = useState<Message[]>([]);
-    const [inputMessage, setInPutMessage] = useState<string>('')
+    // const [inputMessage, setInPutMessage] = useState<string>('')
     const auth = useContext(AuthContext) as { loggedInUser: any }
     const messageEndRef = useRef(null)
 
@@ -46,7 +46,7 @@ const ChatContainer = ({ user }: ChatViewProps) => {
 
     useEffect(() => {
         if (messageEndRef.current && messages) {
-            // messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+            //  messageEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
     const [imagePreview,] = useState(null);
@@ -95,7 +95,7 @@ const ChatContainer = ({ user }: ChatViewProps) => {
 
             socket.emit('newMessage', {
                 receiver: user?._id,
-                sender: auth.loggedInUser._id
+                sender: auth.loggedInUser.id
             })
 
         } catch (exception) {
@@ -115,7 +115,8 @@ const ChatContainer = ({ user }: ChatViewProps) => {
     //     }
     // }
     const newMessageReceived = async (data: any) => {
-        if (data.receiver === auth.loggedInUser?._id) {
+        console.log(data)
+        if (data.receiver === auth.loggedInUser?.id) {
             const response = await chatSvc.getMessages(data.sender);
             setMessages(response.data);
         }
@@ -131,6 +132,8 @@ const ChatContainer = ({ user }: ChatViewProps) => {
             socket.off('messageReceived', newMessageReceived)
         }
     }, [])
+
+
 
     return (<>
         <div className="flex-1 flex flex-col overflow-auto">

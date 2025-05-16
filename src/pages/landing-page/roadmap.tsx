@@ -9,8 +9,7 @@ interface RoadmapProps {
 
 interface CardProps {
     index: number;
-    logoSrc: string;
-    logoAlt: string;
+    icon: any;
     title: string;
     description: string;
     background: string;
@@ -36,8 +35,7 @@ export default function Roadmap({ children }: RoadmapProps) {
 
 const RoadmapCard: React.FC<CardProps> = ({
     index,
-    logoSrc,
-    logoAlt,
+    icon,
     title,
     description,
     background
@@ -63,7 +61,8 @@ const RoadmapCard: React.FC<CardProps> = ({
                     rotate
                 }}
             >
-                <img alt={logoAlt} src={`/${logoSrc}.svg`} width={48} height={48} />
+                {/* <img alt={logoAlt} src={`/${logoSrc}.svg`} width={48} height={48} /> */}
+                {icon}
                 <div className="flex flex-col gap-2">
                     <h1 className="font-bold text-2xl text-white">{title}</h1>
                     <p className="font-normal text-white text-sm md:text-lg">{description}</p>

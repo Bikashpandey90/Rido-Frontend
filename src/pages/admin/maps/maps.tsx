@@ -17,7 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import MapView from "@/components/map/map-view"
+// import MapView from "@/components/map/map-view"
 
 
 export default function MapsPage() {

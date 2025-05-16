@@ -8,6 +8,8 @@ import mapsSvc from "@/pages/customer/map/maps.services"
 import { useState, useEffect, useContext } from "react"
 import { RideContext } from "@/context/ride.context"
 import MessageBox from "../chat/chatBox"
+import socket from "@/config/socket.config"
+import { AuthContext } from "@/context/auth.context"
 
 interface RideRequestCardProps {
     request: {
@@ -22,6 +24,7 @@ interface RideRequestCardProps {
         fare: number
         RideStatus: "pending" | "accepted" | "ongoing" | "completed"
         userId: {
+            _id: string
             name: string
             email: string
             image: string
@@ -50,9 +53,12 @@ interface UserDetails {
     _id: string
     name: string
     email: string
-    status: string
+    status?: 'active' | 'inactive',
+
     image: string
     phone: string
+
+
 }
 
 interface RideData {
@@ -103,6 +109,9 @@ export default function RideRequestCard({
     // const [navigatted, setNavigatted] = useState(false)
     // const [acceptedRide, setAcceptedRide] = useState<RideData[]>([])
 
+    console.log(setCancelling)
+    console.log(showCompletedView)
+
     useEffect(() => {
         if (request.RideStatus === "accepted" || ride) {
             setHasAcceptedRide(true)
@@ -114,8 +123,31 @@ export default function RideRequestCard({
             setShowCompletedView(true)
         }
     }, [])
+    const auth = useContext(AuthContext) as { loggedInUser: any }
+    const openConnect = () => {
+        socket.connect()
+    }
+    const handleConnect = (data: any) => {
+        console.log('Connected', data)
+    }
+    // const newRidesReceived = async (data: any) => {
+    //     if (data.ride === 'newRide') {
 
-    const acceptRide = async (rideId: string) => {
+    //     }
+    // }
+
+    useEffect(() => {
+        openConnect()
+        socket.on('connected', handleConnect)
+        // socket.on('newRidesReceived', newRidesReceived)
+
+        return () => {
+            socket.off('connected', handleConnect)
+            // socket.off('newRidesReceived', newRidesReceived)
+        }
+    })
+
+    const acceptRide = async (rideId: string, userId: string) => {
         setAccepting(true)
         try {
             const data = {
@@ -124,10 +156,12 @@ export default function RideRequestCard({
             const response = await mapsSvc.acceptRide(data)
             console.log(response.detail)
 
+            socket.emit('rideStatus', {
+                rider: auth.loggedInUser.id,
+                user: userId
+            })
             setRide(response.detail)
-
             setHasAcceptedRide(true)
-
             onAccept(rideId)
         } catch (exception) {
             console.log(exception)
@@ -135,18 +169,22 @@ export default function RideRequestCard({
             setAccepting(false)
         }
     }
-    const beginRide = async (rideId: string) => {
+    const beginRide = async (rideId: string, userId: string) => {
         try {
             const response = await mapsSvc.updateRide({ rideId, status: "ongoing", RideStatus: "ongoing" })
             console.log(response.detail)
             if (response?.detail?.RideStatus === "ongoing") {
                 setEndButton(true)
             }
+            socket.emit('rideStatus', {
+                rider: auth.loggedInUser.id,
+                user: userId
+            })
         } catch (exception) {
             console.log(exception)
         }
     }
-    async function endRide(rideId: string) {
+    async function endRide(rideId: string, userId: string) {
         try {
             const response = await mapsSvc.updateRide({ rideId, status: "completed", RideStatus: "completed" })
             console.log(response.detail)
@@ -157,10 +195,15 @@ export default function RideRequestCard({
                     setRide({ ...ride, RideStatus: "completed" })
                 }
             }
+            socket.emit('rideStatus', {
+                rider: auth.loggedInUser.id,
+                user: userId
+            })
         } catch (exception) {
             console.log(exception)
         }
     }
+
 
     // Replace the entire return statement with this updated version that separates the cards
     return (
@@ -179,16 +222,10 @@ export default function RideRequestCard({
                                             ? "secondary"
                                             : request.RideStatus === "ongoing"
                                                 ? "default"
-                                                : "success"
+                                                : "secondary"
                                 }
                             >
-                                {request.RideStatus === "pending"
-                                    ? "Pending"
-                                    : request.RideStatus === "accepted"
-                                        ? "Accepted"
-                                        : request.RideStatus === "ongoing"
-                                            ? "In Progress"
-                                            : "Completed"}
+
                             </Badge>
                         </div>
                     </CardHeader>
@@ -255,7 +292,7 @@ export default function RideRequestCard({
                                     className="flex-1 bg-green-600 hover:bg-green-700"
                                     disabled={accepting}
                                     onClick={() => {
-                                        acceptRide(request._id)
+                                        acceptRide(request._id, request.userId._id)
                                     }}
                                 >
                                     {accepting ? "Accepting" : "Accept"}
@@ -278,7 +315,7 @@ export default function RideRequestCard({
                                     {endButton ? "End Ride" : "Begin Ride"}
                                 </Button>
                                 <Button
-                                    variant="success"
+                                    variant="default"
                                     className="flex-1 bg-green-600 hover:bg-green-700"
                                     onClick={() => onComplete(request._id)}
                                 >
@@ -448,7 +485,7 @@ export default function RideRequestCard({
                                     className="flex-1 bg-green-600 hover:bg-green-700 mr-2"
                                     onClick={() => {
                                         // Logic for the next button action
-                                        endButton ? endRide(ride._id) : beginRide(ride._id)
+                                        endButton ? endRide(ride._id, ride.userId._id) : beginRide(ride._id, ride.userId._id)
                                     }}
                                 >
                                     {endButton ? "End Ride" : "Begin Ride"}

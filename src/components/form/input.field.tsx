@@ -23,7 +23,8 @@ export enum InputType {
     TEL = 'tel',
     FILE = 'file',
     NUMBER = 'number',
-    TIME = 'time'
+    TIME = 'time',
+    SELECT = 'select'
 }
 export interface TextInputFieldProps {
     control: any,
@@ -33,6 +34,8 @@ export interface TextInputFieldProps {
     placeholder?: string,
     className?: string,
     id?: string,
+    options?: { label: string; value: string }[] // Add this line to support select options
+    defaultValue?: string // Optional: add defaultValue for selects
     onChangeEvent?: (event: React.ChangeEvent<HTMLInputElement>) => void
 
 

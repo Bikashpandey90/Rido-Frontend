@@ -25,11 +25,13 @@ export const Logos = () => {
     );
 };
 
+import React from "react";
+
 const TranslateWrapper = ({
     children,
     reverse,
 }: {
-    children: JSX.Element;
+    children: React.ReactNode;
     reverse?: boolean;
 }) => {
     return (

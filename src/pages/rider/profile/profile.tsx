@@ -241,7 +241,9 @@ export default function RiderProfile() {
                                         <p className="text-sm text-pink-600">Next tier: 5,000 points</p>
                                         <p className="text-sm font-medium text-pink-700">69%</p>
                                     </div>
-                                    <Progress value={69} className="h-2 bg-pink-100 mt-1" indicatorClassName="bg-pink-500" />
+                                    {/* <Progress value={69} className="h-2 bg-pink-100 mt-1" indicatorClassName="bg-pink-500" /> */}
+                                    <Progress value={69} className="h-2 bg-pink-100 mt-1" />
+
                                 </div>
 
                                 <div className="bg-muted/30 p-4 rounded-xl">

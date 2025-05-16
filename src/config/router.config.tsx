@@ -34,10 +34,10 @@ import UpdateOfferPage from "@/pages/admin/offers/update-offer";
 import AdminChatPage from "@/pages/admin/chats/chats";
 import PaymentDetailsPage from "@/pages/admin/payments/payments.detail";
 import AdminRideDetailsPage from "@/pages/admin/rides/rides.detail";
-import DriverProfilePage from "@/pages/admin/riders/riders.profile";
+// import DriverProfilePage from "@/pages/admin/riders/riders.profile";
 import AdminDriverInfoPage from "@/pages/admin/customers/customers.profile";
 import AdminUserInfoPage from "@/pages/admin/customers/customers.profile";
-import LandingPage, { NavbarDemo } from "@/pages/landing-page/page";
+import { NavbarDemo } from "@/pages/landing-page/page";
 
 
 

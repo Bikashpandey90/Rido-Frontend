@@ -7,6 +7,7 @@ import RiderMapView from "@/components/rider-map/rider-map-view"
 import RiderStatusPanel from "@/components/rider-map/rider-status-panel"
 import riderMapService from "./rider-map-service"
 import { RideContext } from "@/context/ride.context"
+import socket from "@/config/socket.config"
 
 export default function RiderPage() {
 
@@ -33,6 +34,8 @@ export default function RiderPage() {
     // Mock data for current ride
     const [currentRide, setCurrentRide] = useState<any>(null)
 
+    console.log(routeInfo)
+
     // Mock data for pending requests
     const [pendingRequests, setPendingRequests] = useState<any[]>([])
     const fetchRideRequests = async () => {
@@ -56,6 +59,9 @@ export default function RiderPage() {
             console.error(exception);
         }
     };
+    useEffect(() => {
+        fetchRideRequests()
+    }, [])
 
     useEffect(() => {
         console.log("From useEffect", latitude, longitude);
@@ -65,12 +71,12 @@ export default function RiderPage() {
                 return; // Exit early if a ride is accepted
             }
 
-            fetchRideRequests();
-            const interval = setInterval(() => {
-                fetchRideRequests();
-            }, 60000);
+            // fetchRideRequests();
+            // const interval = setInterval(() => {
+            //     fetchRideRequests();
+            // }, 60000);
 
-            return () => clearInterval(interval);
+            // return () => clearInterval(interval);
         }
     }, [latitude, longitude, hasAcceptedRide]);
 
@@ -202,6 +208,34 @@ export default function RiderPage() {
             setShowRoute(false)
         }
     }
+
+
+    const openConnect = () => {
+        socket.connect()
+    }
+    const handleConnect = (data: any) => {
+        console.log('Connected', data)
+    }
+    const newRidesReceived = async (data: any) => {
+        if (data.ride === 'newRide') {
+            fetchRideRequests()
+        }
+    }
+
+    useEffect(() => {
+        openConnect()
+        socket.on('connected', handleConnect)
+        socket.on('newRidesReceived', newRidesReceived)
+
+        return () => {
+            socket.off('connected', handleConnect)
+            socket.off('newRidesReceived', newRidesReceived)
+        }
+    })
+
+
+
+
 
     return (
         <div className="flex min-h-screen flex-col">

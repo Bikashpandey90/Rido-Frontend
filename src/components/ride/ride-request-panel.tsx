@@ -1,6 +1,6 @@
 
 
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -51,6 +51,8 @@ import MessageBox from "../chat/chatBox"
 import { shortify } from "@/lib/utils"
 import { v4 as uuidv4 } from "uuid"
 import CryptoJS from "crypto-js"
+import socket from "@/config/socket.config"
+import { AuthContext } from "@/context/auth.context"
 
 interface RideRequestPanelProps {
     latitude: number | null
@@ -118,38 +120,39 @@ export default function RideRequestPanel({
     const [isMessageOpen, setIsMessageOpen] = useState(false)
 
     const rideRequestDTO = Yup.object({
-        // pickUpLocation: Yup.object({
+        // pickupLocation: Yup.object({
         //     type: Yup.string().default("Point"),
         //     coordinates: Yup.array().of(Yup.number()).length(2).required("Pickup coordinates are required"),
+        //     name: Yup.string().optional(),
         // }).required("Pickup location is required"),
         // dropOffLocation: Yup.object({
         //     type: Yup.string().default("Point"),
         //     coordinates: Yup.array().of(Yup.number()).length(2).required("Dropoff coordinates are required"),
+        //     name: Yup.string().optional(),
         // }).required("Dropoff location is required"),
         // vehicleType: Yup.string().default("bike").required("Vehicle type is required"),
     })
 
-    const reviewCreateDTO = Yup.object({
-        rating: Yup.number().required("Rating is required"),
-        comment: Yup.string().optional(),
-    })
+    // const reviewCreateDTO = Yup.object({
+    //     rating: Yup.number().required("Rating is required"),
+    //     comment: Yup.string().optional(),
+    // })
 
-    const reviewFormSchema = Yup.object({
-        comment: Yup.string().optional(),
-    })
+    // const reviewFormSchema = Yup.object({
+    //     comment: Yup.string().optional(),
+    // })
 
     const {
         control,
         handleSubmit,
-        setError,
         formState: { errors },
     } = useForm({
         resolver: yupResolver(rideRequestDTO),
     })
 
-    const reviewForm = useForm({
-        resolver: yupResolver(reviewFormSchema),
-    })
+    // const reviewForm = useForm({
+    //     resolver: yupResolver(reviewFormSchema),
+    // })
 
     const handleRequestRide = () => {
         setIsWaitingForDriver(false)
@@ -206,6 +209,10 @@ export default function RideRequestPanel({
             setRide(response.detail)
             console.log("Ride Details : ", ride)
             setIsWaitingForDriver(true)
+
+            socket.emit('newRides', {
+                ride: 'newRide'
+            })
             // Don't set isRideRequested to true here
         } catch (exception: any) {
             console.error("Error submitting ride request:", exception)
@@ -272,22 +279,22 @@ export default function RideRequestPanel({
             console.error("Error loading ride details:", exception)
         }
     }
-    useEffect(() => {
-        if (ride) {
-            const interval = setInterval(() => {
-                loadRideDetail()
-            }, 15000) // Call every 15 seconds
+    // useEffect(() => {
+    //     if (ride) {
+    //         const interval = setInterval(() => {
+    //             loadRideDetail()
+    //         }, 15000) // Call every 15 seconds
 
-            const timeout = setTimeout(() => {
-                clearInterval(interval) // Stop after 5 minutes
-            }, 300000) // 5 minutes in milliseconds
+    //         const timeout = setTimeout(() => {
+    //             clearInterval(interval) // Stop after 5 minutes
+    //         }, 300000) // 5 minutes in milliseconds
 
-            return () => {
-                clearInterval(interval)
-                clearTimeout(timeout)
-            }
-        }
-    }, [ride])
+    //         return () => {
+    //             clearInterval(interval)
+    //             clearTimeout(timeout)
+    //         }
+    //     }
+    // }, [ride])
 
     const cancelRide = async (rideId: string) => {
         setCancelling(true)
@@ -358,7 +365,7 @@ export default function RideRequestPanel({
                     }, 500)
                 } catch (error) {
                     console.error("eSewa payment error:", error)
-                    alert(`Failed to initialize eSewa payment: ${error.message || "Unknown error"}`)
+                    alert(`Failed to initialize eSewa payment: "Unknown error"}`)
                 }
             } else if (paymentMethod === "cash") {
                 const response = await mapsSvc.makePayment(ride?._id, paymentMethod, ride?.fare)
@@ -779,7 +786,9 @@ export default function RideRequestPanel({
                     if (status === "success") {
                         console.log("eSewa payment successful, ref ID:", refId)
                         // Call your payment verification API
-                        const response = await mapsSvc.makePayment(ride._id, "esewa", ride.fare, refId)
+                        // const response = await mapsSvc.makePayment(ride._id, "esewa", ride.fare, refId)
+                        const response = await mapsSvc.makePayment(ride._id, "esewa", ride.fare)
+
                         console.log("Payment verification response:", response.detail)
                         setPaymentComplete(true)
                     } else {
@@ -797,6 +806,31 @@ export default function RideRequestPanel({
             handleEsewaReturn()
         }
     }, [window.location.search, ride])
+    const auth = useContext(AuthContext) as { loggedInUser: any }
+
+    const openConnect = () => {
+        socket.connect()
+    }
+    const handleConnect = (data: any) => {
+        console.log('Connected', data)
+    }
+    const rideStatusUpdated = async (data: any) => {
+        console.log(data)
+
+        if (data.user === auth.loggedInUser.id) {
+            loadRideDetail()
+        }
+    }
+    useEffect(() => {
+        openConnect()
+        socket.on('connected', handleConnect)
+        socket.on('rideStatusUpdated', rideStatusUpdated)
+
+        return () => {
+            socket.off('connected', handleConnect)
+            socket.off('rideStatusUpdated', rideStatusUpdated)
+        }
+    })
 
     return (
         <>
@@ -912,7 +946,7 @@ export default function RideRequestPanel({
                                         onLocationSelect={handlePickupSelect}
                                         useCurrentLocation={true}
                                         errMsg={errors?.pickupLocation?.message as string}
-                                        captureLocationName={true}
+                                    // captureLocationName={true}
                                     />
 
                                     <LocationSearch
@@ -923,7 +957,7 @@ export default function RideRequestPanel({
                                         placeholder="Enter destination"
                                         onLocationSelect={handleDestinationSelect}
                                         errMsg={errors?.dropOffLocation?.message as string}
-                                        captureLocationName={true}
+                                    // captureLocationName={true}
                                     />
                                     <input type="hidden" {...control.register("vehicleType")} defaultValue="bike" />
 
@@ -1220,7 +1254,7 @@ export default function RideRequestPanel({
                                             key={index}
                                             className="flex items-center gap-4 p-4 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
                                             onClick={() => {
-                                                control.setValue("vehicleType", vehicle.type.toLowerCase())
+                                                // control.setValue("vehicleType", vehicle.type.toLowerCase())
                                                 setStep("payment")
                                             }}
                                         >

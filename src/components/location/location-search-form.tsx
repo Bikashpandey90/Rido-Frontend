@@ -46,6 +46,7 @@ export default function LocationSearchForm({
     const pickupValue = watch("pickup")
     const destinationValue = watch("destination")
 
+
     const pickupDebounceTimeout = useRef<NodeJS.Timeout | null>(null)
     const destinationDebounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
@@ -66,6 +67,7 @@ export default function LocationSearchForm({
         }
 
         setPickupSearch(pickupValue)
+        console.log(pickupSearch)
 
         pickupDebounceTimeout.current = setTimeout(async () => {
             if (pickupValue && pickupValue.length > 3) {
@@ -92,6 +94,7 @@ export default function LocationSearchForm({
         }
 
         setDestinationSearch(destinationValue)
+        console.log(destinationSearch)
 
         destinationDebounceTimeout.current = setTimeout(async () => {
             if (destinationValue && destinationValue.length > 3) {

@@ -16,7 +16,7 @@ const Login = () => {
     const [activeTab, setActiveTab] = useState<string>('customer')
     const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
-    const { loggedInUser, setLoggedInUser } = useContext(AuthContext) as { loggedInUser: any, setLoggedInUser: Function }
+    const { setLoggedInUser } = useContext(AuthContext) as { setLoggedInUser: Function }
 
     const [showPassword, setShowPassword] = useState(false)
     const [showRiderPassword, setShowRiderPassword] = useState(false)

@@ -17,7 +17,6 @@ import {
     Bar,
     PieChart,
     Pie,
-    Cell,
 } from "recharts"
 import { useNavigate } from "react-router-dom"
 
@@ -462,9 +461,10 @@ export default function OfferDetailsPage() {
                                                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                                                         labelLine={false}
                                                     >
-                                                        {userSegmentData.map((entry, index) => (
+                                                        {/* {userSegmentData.map((entry, index) => (
                                                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                                        ))}
+                                                            
+                                                        ))} */}
                                                     </Pie>
                                                     <Tooltip
                                                         contentStyle={{

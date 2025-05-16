@@ -1,4 +1,3 @@
-import RippleButton from "@/components/button/ripple-button"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"

@@ -9,16 +9,13 @@ import {
     Menu,
     MessageCircle,
     MessageSquare,
-    Moon,
     Navigation,
     PanelLeftClose,
     Search,
     Settings,
-    Sun,
     Ticket,
     Users,
 } from "lucide-react"
-import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"

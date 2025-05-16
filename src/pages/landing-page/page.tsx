@@ -13,9 +13,9 @@ import {
     MobileNavMenu,
 } from "@/components/resizable-navbar/navbar"
 import Hero from "./hero"
-import TrustedBy from "./trusted"
+// import TrustedBy from "./trusted"
 import Featured from "./features"
-import HowItWorks from "./howitworks"
+// import HowItWorks from "./howitworks"
 import Testimonials from "./testimonials"
 import AppDownload from "./app"
 import Pricing from "./pricing"
@@ -23,9 +23,10 @@ import Driver from "./driver"
 import CTA from "./cta"
 import Footer from "./footer"
 import { Logos } from "./logos"
-import { ThreeDMarqueeDemo } from "./customers"
-import Eight from "./bento-grid"
+// import { ThreeDMarqueeDemo } from "./customers"
+// import Eight from "./bento-grid"
 import RoadmapDemo from "./features-new"
+import { StickyCards } from "./new-features"
 
 export default function LandingPage() {
     const [isScrolled, setIsScrolled] = useState(false)
@@ -65,12 +66,14 @@ export default function LandingPage() {
                     {/* Features Section */}
                     <Featured />
 
-                    <RoadmapDemo></RoadmapDemo>
 
 
 
                     {/* How It Works Section */}
-                    <HowItWorks />
+                    <RoadmapDemo></RoadmapDemo>
+
+                    {/* <HowItWorks /> */}
+                    <StickyCards />
 
                     {/* <ThreeDMarqueeDemo /> */}
 

@@ -12,8 +12,7 @@ interface SketchfabModelProps {
 export default function SketchfabModel({
     modelId,
     height = 300,
-    autoStart = true,
-    transparent = true,
+    
     className = "",
 }: SketchfabModelProps) {
     const iframeRef = useRef<HTMLIFrameElement>(null)

@@ -147,7 +147,7 @@ export default function RideDetailPage() {
                                         <div className="flex items-center gap-2 text-muted-foreground">
                                             <Calendar size={16} />
                                             <span>
-                                                {datify(new Date(rideDetail?.createdAt))} at {timefy(new Date(rideDetail?.createdAt))}
+                                                {datify(new Date(rideDetail?.createdAt ?? ''))} at {timefy(new Date(rideDetail?.createdAt ?? ''))}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-2 text-muted-foreground mt-1">
@@ -267,11 +267,11 @@ export default function RideDetailPage() {
                                     <div className="space-y-2">
                                         <div className="flex justify-between">
                                             <span className="text-muted-foreground">Base fare</span>
-                                            <span>NPR {(rideDetail?.fare * 0.8).toFixed(2)}</span>
+                                            <span>NPR {(rideDetail?.fare ?? 0 * 0.8).toFixed(2)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-muted-foreground">Service fee</span>
-                                            <span>NPR {(rideDetail?.fare * 0.2).toFixed(2)}</span>
+                                            <span>NPR {(rideDetail?.fare ?? 0 * 0.2).toFixed(2)}</span>
                                         </div>
                                         <Separator className="my-2" />
                                         <div className="flex justify-between font-medium">
