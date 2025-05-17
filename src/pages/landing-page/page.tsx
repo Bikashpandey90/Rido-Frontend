@@ -27,6 +27,7 @@ import { Logos } from "./logos"
 // import Eight from "./bento-grid"
 import RoadmapDemo from "./features-new"
 import { StickyCards } from "./new-features"
+import ScrollingTestimonials from "./new-testimonials"
 
 export default function LandingPage() {
     const [isScrolled, setIsScrolled] = useState(false)
@@ -79,7 +80,8 @@ export default function LandingPage() {
 
 
                     {/* Testimonials Section */}
-                    <Testimonials />
+                    {/* <ScrollingTestimonials /> */}
+                    {/* <Testimonials /> */}
 
                     {/* <Eight /> */}
 
@@ -127,7 +129,7 @@ export function NavbarDemo() {
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    return (
+    return (<>
         <div className="relative w-full ">
             <Navbar >
                 {/* Desktop Navigation */}
@@ -186,7 +188,11 @@ export function NavbarDemo() {
             {/* <DummyContent /> */}
             <LandingPage />
 
+
             {/* Navbar */}
+
         </div>
+
+    </>
     );
 }
