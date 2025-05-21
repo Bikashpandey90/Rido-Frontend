@@ -945,7 +945,7 @@ export default function RideRequestPanel({
                                         placeholder="Current location"
                                         onLocationSelect={handlePickupSelect}
                                         useCurrentLocation={true}
-                                        errMsg='Error'
+                                        errMsg=''
                                     // captureLocationName={true}
                                     />
 
@@ -956,7 +956,7 @@ export default function RideRequestPanel({
                                         label="Destination"
                                         placeholder="Enter destination"
                                         onLocationSelect={handleDestinationSelect}
-                                        errMsg='Error'
+                                        errMsg=''
                                     // captureLocationName={true}
                                     />
                                     {/* <input type="hidden" {...control.register("vehicleType")} defaultValue="bike" /> */}

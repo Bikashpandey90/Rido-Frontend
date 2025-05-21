@@ -336,7 +336,7 @@ const Register = () => {
                                             name="nid"
                                             control={control}
                                             placeholder="4055 8784 98"
-                                            errMsg='Nid Error'
+                                            errMsg=''
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -346,7 +346,7 @@ const Register = () => {
                                             name="address"
                                             control={control}
                                             placeholder="123 Main St, City, Country"
-                                            errMsg='Address Error'
+                                            errMsg=''
                                         />
                                     </div>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -386,7 +386,7 @@ const Register = () => {
                                                         { label: "Bike", value: "bike" },
                                                     ]}
                                                     defaultValue="bike"
-                                                    errMsg='Vehicle Type error'
+                                                    errMsg=''
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -397,7 +397,7 @@ const Register = () => {
                                                     name="model"
                                                     control={control}
                                                     placeholder="Toyota Camry"
-                                                    errMsg='Model error'
+                                                    errMsg=''
                                                 />
                                             </div>
                                         </div>
@@ -409,7 +409,7 @@ const Register = () => {
                                                     name="plateNumber"
                                                     control={control}
                                                     placeholder="ABC-123"
-                                                    errMsg='Plate Number error'
+                                                    errMsg=''
                                                 />
                                             </div>
                                             <div className="space-y-2">
@@ -420,7 +420,7 @@ const Register = () => {
                                                     name="registrationNumber"
                                                     control={control}
                                                     placeholder="REG12345"
-                                                    errMsg='Registration number error'
+                                                    errMsg=''
                                                 />
                                             </div>
                                         </div>
