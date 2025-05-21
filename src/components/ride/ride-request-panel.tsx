@@ -145,7 +145,7 @@ export default function RideRequestPanel({
     const {
         control,
         handleSubmit,
-        formState: { errors },
+        // formState: { errors },
     } = useForm({
         resolver: yupResolver(rideRequestDTO),
     })
@@ -945,7 +945,7 @@ export default function RideRequestPanel({
                                         placeholder="Current location"
                                         onLocationSelect={handlePickupSelect}
                                         useCurrentLocation={true}
-                                        errMsg={errors?.pickupLocation?.message as string}
+                                        errMsg='Error'
                                     // captureLocationName={true}
                                     />
 
@@ -956,10 +956,10 @@ export default function RideRequestPanel({
                                         label="Destination"
                                         placeholder="Enter destination"
                                         onLocationSelect={handleDestinationSelect}
-                                        errMsg={errors?.dropOffLocation?.message as string}
+                                        errMsg='Error'
                                     // captureLocationName={true}
                                     />
-                                    <input type="hidden" {...control.register("vehicleType")} defaultValue="bike" />
+                                    {/* <input type="hidden" {...control.register("vehicleType")} defaultValue="bike" /> */}
 
                                     <Tabs defaultValue="now">
                                         <TabsList className="grid w-full grid-cols-2">

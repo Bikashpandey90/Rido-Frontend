@@ -149,7 +149,7 @@ function RoutingMachine({
                 router: L.Routing.osrmv1({
                     serviceUrl: "https://router.project-osrm.org/route/v1",
                 }),
-            }).addTo(map)
+            } as any).addTo(map)
 
             // Store reference to control
             routingControlRef.current = routingControl

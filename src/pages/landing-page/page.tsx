@@ -16,7 +16,7 @@ import Hero from "./hero"
 // import TrustedBy from "./trusted"
 import Featured from "./features"
 // import HowItWorks from "./howitworks"
-import Testimonials from "./testimonials"
+// import Testimonials from "./testimonials"
 import AppDownload from "./app"
 import Pricing from "./pricing"
 import Driver from "./driver"
@@ -27,7 +27,7 @@ import { Logos } from "./logos"
 // import Eight from "./bento-grid"
 import RoadmapDemo from "./features-new"
 import { StickyCards } from "./new-features"
-import ScrollingTestimonials from "./new-testimonials"
+// import ScrollingTestimonials from "./new-testimonials"
 
 export default function LandingPage() {
     const [isScrolled, setIsScrolled] = useState(false)

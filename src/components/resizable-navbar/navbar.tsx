@@ -169,7 +169,7 @@ export const MobileNavHeader = ({ children, className }: MobileNavHeaderProps) =
     return <div className={cn("flex w-full flex-row items-center justify-between", className)}>{children}</div>
 }
 
-export const MobileNavMenu = ({ children, className, isOpen, onClose }: MobileNavMenuProps) => {
+export const MobileNavMenu = ({ children, className, isOpen }: MobileNavMenuProps) => {
     return (
         <AnimatePresence>
             {isOpen && (

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useMemo } from "react"
-import { MapContainer, TileLayer, useMap, Circle } from "react-leaflet"
+import { MapContainer, TileLayer, useMap, Circle, Marker } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
 import "leaflet-routing-machine"
@@ -184,7 +184,7 @@ function RoutingMachine({ waypoints, setRouteInfo }: { waypoints: L.LatLng[]; se
                 router: L.Routing.osrmv1({
                     serviceUrl: "https://router.project-osrm.org/route/v1",
                 }),
-            }).addTo(map)
+            } as any).addTo(map)
 
             // Store reference to control
             routingControlRef.current = routingControl
@@ -299,15 +299,15 @@ export default function MapView({
 
                 {/* Custom markers for pickup and destination */}
                 {userLocation && (
-                    <L.Marker position={userLocation} icon={pickupIcon}>
+                    <Marker position={userLocation} icon={pickupIcon}>
                         {/* <L.Popup>Pickup Location</L.Popup> */}
-                    </L.Marker>
+                    </Marker>
                 )}
 
                 {destination && (
-                    <L.Marker position={destination} icon={destinationIcon}>
+                    <Marker position={destination} icon={destinationIcon}>
                         {/* <L.Popup>Destination</L.Popup> */}
-                    </L.Marker>
+                    </Marker>
                 )}
 
                 {/* Routing */}
