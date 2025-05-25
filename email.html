@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px 40px;
+            overflow: hidden;
+        }
+
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .logo svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .link-to-webtite {
+            font-size: 14px;
+            text-decoration: none;
+            color: #333;
+            text-decoration: underline;
+        }
+
+        .hero-content img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .content .title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .content p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .otp-box {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            letter-spacing: 5px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .signature {
+            font-size: 15px;
+            color: #777;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+            margin-top: 20px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .footer p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .social-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-container img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="header">
+            <a href="#" class="logo" style="text-decoration: none; color: #333; gap: 10px;">
+                <svg width="40" height="auto" viewBox="0 0 50 39" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    style="fill: #333;">
+                    <path d="M16.4992 2H37.5808L22.0816 24.9729H1L16.4992 2Z" stopColor="#000000"></path>
+                    <path d="M17.4224 27.102L11.4192 36H33.5008L49 13.0271H32.7024L23.2064 27.102H17.4224Z"
+                        stopColor="#000000"></path>
+                </svg>
+                <span style="font-size: 30px; font-weight: 600; color: #333;margin-left: 10px;">RideX</span>
+                <!-- <img src="https://example.com/logo.png" alt="Logo"> -->
+            </a>
+            <a href="#" class="link-to-webtite">View in Browser</a>
+        </div>
+        <div class="hero-content">
+            <img src="https://cdni.iconscout.com/illustration/premium/thumb/boy-sending-thank-you-email-illustration-download-in-svg-png-gif-file-formats--letter-message-communication-pack-miscellaneous-illustrations-10892635.png?f=webp"
+                alt="Hero Image">
+        </div>
+        <div class="content">
+            <p class="title">Dear <span>Bikash,</span></p>
+            <p> Thank you for signing in. Please use the One-Time Password (OTP) below to complete your login process.
+                This OTP is valid for the next 10 minutes. Do not share it with anyone.</p>
+            <div class="otp-box">123456</div>
+        </div>
+        <div class="signature">
+            <p>Best Regards,</p>
+            <p>RideX</p>
+        </div>
+        <div class="footer">
+            <p style="display: flex; align-self: center; justify-self: center;color: gray;margin-top: 10px;">Stay in
+                Touch</p>
+            <div class="social-container">
+                <a href="#" class="facebook">
+                    <img src="data:image/png;base64,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"
+                        alt="Facebook">
+                </a>
+                <a href="#" class="linkedin">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAllBMVEUMZMX///8AYcQAWcFDf8nL3PIAWrzQ3vMAYcI0eclZjtAucslAgsz6/v3x9/sgbclOhM8AX8QAYsAAX70AV70AWMLm7vgAXb4sdsw5fsoRbsVmltK6z+iUt+AMZcGDrN3c6fNvnddiltWqwuPA0+r0+vyOrt+lweR9pduuyueUst9Lh81pldd1mtYdbcunxOXO4u7Z4fGRyVlRAAAEKUlEQVR4nO3ce1faMBzG8SblEpSCiUUuQrkMhsCc+v7f3Ko4KjW/yLY0WXOez9mf4Ml3vSW1NYoAAAAAAAAAAAAAAAAAAAAAAAAAAADgYiriIsqU72FURcapGnXHk5aMue+xVCCT6n56x960Z2OpMt8jsozz+Xve0Xqc+h6SXbKzYOeSfex7UBap+J591lThHI3awPxw5KGcVFUj0RayaRrI6UaUj8GTpfA9NivknApkvTC2YdwjC9lc+h6dBWpFB7JFCIXx1FDIRr6HZ0Fq2EkZewjgXNMnLhVH34a+x/fPeMdYOK3/gchvTIFsXf/ZKR+bC+u/DcW1cS/d1f84jFobU+H3ANYXadNU2PU9PAvkd0Ngz/forMgMhU/1P5Xm4h0ZmHQCOAzz68WEPNdsg9iE+ZH4QATeBTApPYqf9PvoKIh99E2qOxQ3jVvf47JHDT5fMl5GAQW+3tNvnF/4N3shwrhJc8Ljw/Q0Q13MJ4GcRc8IORjP99vZfpWlQe2gH3EZx7Gs/4IJAADqQ3DJX/+FM38vqHyKlA5Hhx+Pj49X43468P34CheEiz9Z+pTMlrvFaQ6YbNrblRpKf6vNbHRNKX2yT/kwSVd5XluzGGs//Ew9NfIGS/RYs3X2yUGzp7dpnMYu+zPql1mbp46f+XxeSCkVxrpt8+bmWJgJOTPeYP7m5QkWi4Wye0d94t3m3sNmtFao5OyLvle7zPnRaKlQCb6+IDBfXvddJ1oq5BH5WE7JXd/xwWilUKnJpYGM9a7dPk5mpfCWP18cmO+okdOtaKVwYHxm5ZP1wOWNPBuFneUfBTK2dHkzyEbhwfirco3NxOF+aqPw8rPMbzuHV34bhX+h4e6q6KnQ4ZM6ngrZyNlG9FXo7hfMvgp7zt7o8FXIDq52U2+FznbTKgovmgAsalq4mB0mQqjJYfvler98o6sWhevuYPh2C5jz4WD1ReMPR4soi4W91dmtXy7MK469o7mpvcLn8nRaSWPi9PzH/++FCXvW3LuXpoXxi6MllK1tqHtGLBMd0zccLYNtFR60W8T0wkqv7yTQVuGTfpfLuvRXkms3sxo7hQlx/yy7NayOO3Uq3MXExY148PFY6OZyYafwihqsXNJfGteoMCGXQoYfzxo1KmxSO2kkJvTLcXUq3BreraFnp3UqNLwT3aJPpnUqPNBjTV+CKDScFVv0t+pUaLiytegXq1BoCQoLKNRDYfVQWEChHgqrh8ICCvVQWD0UFlCoh8LqobCAQj0UVg+FBRTqobB6KCygUA+F1UNhAYV6KKweCgso1ENh9VBYQKEeCquHwkKAhe1SIf2UoaFwSP+/dB29FtTvUsbnH+Q3VxTDmxOq+zffskqJiOtFpZda+OV/M6uQKepLof0NWAAAAAAAAAAAAAAAAAAAAAAAAAAAgAr8Aj5RWY0PDbn2AAAAAElFTkSuQmCC"
+                        alt="Twitter">
+                </a>
+                <a href="#" class="github">
+                    <img src="data:image/png;base64,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"
+                        alt="LinkedIn">
+                </a>
+            </div>
+            <div class="copyright">
+                <p style="margin-bottom: 3px;">
+                    Email Sent by RideX
+                </p>
+                <p>Copyright © 2023 RideX. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -78,11 +78,9 @@ const Register = () => {
         setLoading(true)
         try {
             const response = await authSvc.registerApi(data)
-
             console.log(response)
             setRegisteredUser(response.data)
             setShowOtpModal(true)
-            console.log("OTP Modal state:", showOtpModal) // Debugging purpose
         } catch (exception) {
             console.log(exception)
         } finally {
