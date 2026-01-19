@@ -15,7 +15,8 @@ interface MapViewProps {
     showRoute: boolean
     setRouteInfo: (info: any) => void
     setShowDirectionsCard: (show: boolean) => void
-    className?: string
+    className?: string,
+    routeInfo?: any
 }
 
 // Custom user location marker component
@@ -210,12 +211,14 @@ export default function MapView({
     showRoute,
     setRouteInfo,
     setShowDirectionsCard,
-    className
+    className,
+    routeInfo
 }: MapViewProps) {
     // Default marker position
     const markers = {
         geocode: [latitude ?? 27.7103, longitude ?? 85.3222] as [number, number],
     }
+    console.log(routeInfo)
 
     // Create waypoints for routing
     const waypoints = useMemo(() => {
@@ -252,7 +255,7 @@ export default function MapView({
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=7bc8f939ae3246b29e516ccf0e07c43d"
+                    url="https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=7bc8f939ae3246b29e516ccf0e07c43d"
                     className="-z-0"
                 />
                 <MapUpdater center={markers.geocode} />

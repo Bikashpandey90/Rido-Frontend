@@ -83,6 +83,7 @@ export default function MapPage() {
                         showRoute={showRoute}
                         setRouteInfo={setRouteInfo}
                         setShowDirectionsCard={setShowDirectionsCard}
+                        routeInfo={routeInfo}
                     />
 
                     {/* Map action buttons */}

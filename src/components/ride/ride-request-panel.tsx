@@ -1,5 +1,3 @@
-
-
 import { useContext, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,8 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
     Clock,
     Car,
-    ChevronLeft,
-    CreditCard,
+
     MapPin,
     User,
     CheckCircle,
@@ -100,6 +97,7 @@ export default function RideRequestPanel({
     setShowRoute,
     routeInfo,
 }: RideRequestPanelProps) {
+    console.log(routeInfo)
     const [isRideRequested, setIsRideRequested] = useState(false)
     const [step, setStep] = useState<"location" | "vehicle" | "payment" | "confirmation">("location")
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -279,22 +277,7 @@ export default function RideRequestPanel({
             console.error("Error loading ride details:", exception)
         }
     }
-    // useEffect(() => {
-    //     if (ride) {
-    //         const interval = setInterval(() => {
-    //             loadRideDetail()
-    //         }, 15000) // Call every 15 seconds
 
-    //         const timeout = setTimeout(() => {
-    //             clearInterval(interval) // Stop after 5 minutes
-    //         }, 300000) // 5 minutes in milliseconds
-
-    //         return () => {
-    //             clearInterval(interval)
-    //             clearTimeout(timeout)
-    //         }
-    //     }
-    // }, [ride])
 
     const cancelRide = async (rideId: string) => {
         setCancelling(true)
@@ -1220,167 +1203,8 @@ export default function RideRequestPanel({
                             </div>
                         )}
 
-                        {step === "vehicle" && (
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <Button variant="ghost" size="icon" onClick={() => setStep("location")} className="mr-2">
-                                        <ChevronLeft className="h-5 w-5" />
-                                    </Button>
-                                    <h2 className="text-xl font-bold">Choose Vehicle Type</h2>
-                                </div>
 
-                                <div className="space-y-3">
-                                    {[
-                                        {
-                                            type: "Economy",
-                                            price: "$12.50",
-                                            time: "5 min away",
-                                            description: "Affordable rides for everyday use",
-                                        },
-                                        {
-                                            type: "Comfort",
-                                            price: "$18.75",
-                                            time: "3 min away",
-                                            description: "More space and comfort for your journey",
-                                        },
-                                        {
-                                            type: "Premium",
-                                            price: "$25.00",
-                                            time: "7 min away",
-                                            description: "Luxury vehicles with top-rated drivers",
-                                        },
-                                    ].map((vehicle, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center gap-4 p-4 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
-                                            onClick={() => {
-                                                // control.setValue("vehicleType", vehicle.type.toLowerCase())
-                                                setStep("payment")
-                                            }}
-                                        >
-                                            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                                <Car className="h-6 w-6 text-blue-700" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex justify-between">
-                                                    <p className="font-medium">{vehicle.type}</p>
-                                                    <p className="font-medium">{vehicle.price}</p>
-                                                </div>
-                                                <div className="flex justify-between">
-                                                    <p className="text-sm text-muted-foreground">{vehicle.description}</p>
-                                                    <p className="text-sm text-muted-foreground">{vehicle.time}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
 
-                        {step === "payment" && (
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <Button variant="ghost" size="icon" onClick={() => setStep("vehicle")} className="mr-2">
-                                        <ChevronLeft className="h-5 w-5" />
-                                    </Button>
-                                    <h2 className="text-xl font-bold">Payment Method</h2>
-                                </div>
-
-                                <div className="space-y-3">
-                                    {[
-                                        { method: "Credit Card", number: "**** **** **** 4242", default: true },
-                                        { method: "PayPal", number: "john.doe@example.com", default: false },
-                                    ].map((payment, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center gap-4 p-4 border rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950 cursor-pointer"
-                                            onClick={() => setStep("confirmation")}
-                                        >
-                                            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                                <CreditCard className="h-6 w-6 text-blue-700" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex justify-between">
-                                                    <p className="font-medium">{payment.method}</p>
-                                                    {payment.default && (
-                                                        <span className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded-full">
-                                                            Default
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <p className="text-sm text-muted-foreground">{payment.number}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    <Button variant="outline" className="w-full">
-                                        Add Payment Method
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-
-                        {step === "confirmation" && (
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <Button variant="ghost" size="icon" onClick={() => setStep("payment")} className="mr-2">
-                                        <ChevronLeft className="h-5 w-5" />
-                                    </Button>
-                                    <h2 className="text-xl font-bold">Confirm Ride</h2>
-                                </div>
-
-                                <Card>
-                                    <CardContent className="pt-6 space-y-4">
-                                        <div className="flex justify-between">
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Pickup</p>
-                                                <p className="font-medium">{ride?.pickUpLocation?.name}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-sm text-muted-foreground">Destination</p>
-                                                <p className="font-medium">{ride?.dropOffLocation?.name}</p>
-                                            </div>
-                                        </div>
-
-                                        <Separator />
-
-                                        <div className="flex justify-between">
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Vehicle</p>
-                                                <p className="font-medium">Comfort</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-sm text-muted-foreground">Estimated Time</p>
-                                                <p className="font-medium">3 min away</p>
-                                            </div>
-                                        </div>
-
-                                        <Separator />
-
-                                        <div className="flex justify-between">
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Payment</p>
-                                                <p className="font-medium">Credit Card (*4242)</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="text-sm text-muted-foreground">Estimated Price</p>
-                                                <p className="font-medium">
-                                                    {routeInfo?.distance ? `${((routeInfo.distance / 1000) * 1.5).toFixed(2)}` : "$18.75"}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                    <CardFooter className="flex-col space-y-2">
-                                        <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={handleRequestRide}>
-                                            Confirm Ride
-                                        </Button>
-                                        <Button variant="outline" className="w-full" onClick={() => setStep("location")}>
-                                            Edit Request
-                                        </Button>
-                                    </CardFooter>
-                                </Card>
-                            </div>
-                        )}
                     </div>
                 ) : // Check if ride is completed
                     ride?.RideStatus === "completed" ? (
@@ -1487,7 +1311,7 @@ export default function RideRequestPanel({
                                         </div>
                                         <div className="text-right">
                                             <p className="text-sm text-muted-foreground">Payment Method</p>
-                                            <p className="font-medium">Credit Card (*4242)</p>
+                                            <p className="font-medium">Esewa/Cash</p>
                                         </div>
                                     </div>
                                 </CardContent>

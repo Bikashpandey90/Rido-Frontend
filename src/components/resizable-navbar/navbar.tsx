@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import {  Menu, Navigation, X } from "lucide-react"
+import { Menu, Navigation, X } from "lucide-react"
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react"
 
 import React, { useRef, useState } from "react"
@@ -62,7 +62,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
         <motion.div
             ref={ref}
             // IMPORTANT: Change this to class of `fixed` if you want the navbar to be fixed
-            className={cn("sticky inset-x-0 top-0 z-40 w-full ", className)}
+            className={cn("fixed inset-x-0 top-0 z-40 w-full mt-4 ", className)}
         >
             {React.Children.map(children, (child) =>
                 React.isValidElement(child)
