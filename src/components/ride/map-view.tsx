@@ -251,7 +251,7 @@ export default function MapView({
                 <MapControls />
 
                 {routeInfo?.instructions && (
-                    <DirectionsStepCard instructions={routeInfo.instructions} />
+                    <DirectionsStepCard instructions={routeInfo.instructions} totalDistance={routeInfo.distance} totalDuration={routeInfo.duration} />
                 )}
             </MapContainer>
         </div >

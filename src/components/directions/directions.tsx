@@ -4,10 +4,26 @@ import { useState } from "react"
 
 interface DirectionsStepCardProps {
     instructions: any[]
+    totalDistance: number
+    totalDuration: number
 }
 
-export default function DirectionsStepCard({ instructions }: DirectionsStepCardProps) {
+
+
+export default function DirectionsStepCard({ instructions, totalDistance,totalDuration }: DirectionsStepCardProps) {
     const [currentStep, setCurrentStep] = useState(0)
+
+    const formatDistance = (meters: number) =>
+        meters < 1000 ? `${Math.round(meters)} m` : `${(meters / 1000).toFixed(1)} km`
+
+    const formatDuration = (seconds: number) => {
+        const mins = Math.round(seconds / 60)
+        if (mins < 60) return `${mins} min`
+        const h = Math.floor(mins / 60)
+        const m = mins % 60
+        return `${h}h ${m}m`
+    }
+
 
     if (!instructions || instructions.length === 0) return null
 
@@ -22,6 +38,11 @@ export default function DirectionsStepCard({ instructions }: DirectionsStepCardP
                 <span className="font-semibold text-sm">
                     Step {currentStep + 1} of {instructions.length}
                 </span>
+            </div>
+
+            {/* Route summary */}
+            <div className="text-xs text-gray-500 mb-3">
+                {formatDistance(totalDistance)} • {formatDuration(totalDuration)}
             </div>
 
             {/* Instruction */}

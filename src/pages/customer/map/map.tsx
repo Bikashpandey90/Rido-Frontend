@@ -8,6 +8,7 @@ import RideRequestPanel from "@/components/ride/ride-request-panel"
 export default function MapPage() {
     const [routeInfo, setRouteInfo] = useState<any>(null)
     const [showDirectionsCard, setShowDirectionsCard] = useState(false)
+    console.log(showDirectionsCard)
 
     // Location states
     const [latitude, setLatitude] = useState<number | null>(null)
@@ -102,29 +103,7 @@ export default function MapPage() {
                         </Button>
                     </div>
 
-                    {/* Directions card */}
-                    {showDirectionsCard && routeInfo && (
-                        <div className="absolute bottom-24 left-4 z-[1000] w-80 bg-white rounded-lg shadow-lg p-4">
-                            <div className="text-base font-medium flex items-center mb-2">
-                                <Navigation className="h-4 w-4 mr-2" />
-                                Route Information
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex justify-between">
-                                    <span className="text-sm font-medium">Distance:</span>
-                                    <span className="text-sm">
-                                        {routeInfo.distance ? `${(routeInfo.distance / 1000).toFixed(1)} km` : "Calculating..."}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-sm font-medium">Duration:</span>
-                                    <span className="text-sm">
-                                        {routeInfo.duration ? `${Math.round(routeInfo.duration / 60)} min` : "Calculating..."}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+
                 </div>
 
                 {/* Ride request panel */}
