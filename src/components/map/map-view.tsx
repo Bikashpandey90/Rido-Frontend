@@ -122,41 +122,7 @@ function MapUpdater({ center }: { center: [number, number] }) {
     return null
 }
 
-/**
- * Directions card component
- * Displays route information in a floating card
- */
-function DirectionsCard({ routeInfo }: { routeInfo: any }) {
-    if (!routeInfo) return null
 
-    return (
-        <div className="absolute bottom-24 left-4 z-[1000] w-80 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4">
-            <div className="text-base flex items-center font-medium mb-2">
-                <Navigation className="h-4 w-4 mr-2" />
-                Route Information
-            </div>
-            <div className="space-y-2">
-                <div className="flex justify-between">
-                    <span className="text-sm font-medium">Distance:</span>
-                    <span className="text-sm">
-                        {routeInfo.distance ? `${(routeInfo.distance / 1000).toFixed(1)} km` : "Calculating..."}
-                    </span>
-                </div>
-                <div className="flex justify-between">
-                    <span className="text-sm font-medium">Duration:</span>
-                    <span className="text-sm">
-                        {routeInfo.duration ? `${Math.round(routeInfo.duration / 60)} min` : "Calculating..."}
-                    </span>
-                </div>
-            </div>
-        </div>
-    )
-}
-
-/**
- * Custom routing control component
- * Handles the display of routes between waypoints
- */
 function RoutingMachine({ waypoints, setRouteInfo }: { waypoints: L.LatLng[]; setRouteInfo: (info: any) => void }) {
     const map = useMap()
     const routingControlRef = useRef<L.Routing.Control | null>(null)
@@ -220,8 +186,7 @@ interface MapViewProps {
     destination: [number, number] | null
     waypoints: L.LatLng[]
     showRoute: boolean
-    routeInfo: any
-    showDirectionsCard: boolean
+
     setRouteInfo: (info: any) => void
     onLocate: () => void
     onNavigate: () => void
@@ -233,8 +198,7 @@ export default function MapView({
     destination,
     waypoints,
     showRoute,
-    routeInfo,
-    showDirectionsCard,
+
     setRouteInfo,
     onLocate,
     onNavigate,
@@ -316,8 +280,6 @@ export default function MapView({
                 {/* Map controls */}
                 <MapControls onLocate={onLocate} />
 
-                {/* Directions card */}
-                {showDirectionsCard && routeInfo && <DirectionsCard routeInfo={routeInfo} />}
             </MapContainer>
 
             {/* Map action buttons */}

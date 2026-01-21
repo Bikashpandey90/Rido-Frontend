@@ -158,7 +158,6 @@ function RoutingMachine({
             routingControl.on("routesfound", (e) => {
                 const routes = e.routes
                 if (routes && routes.length > 0) {
-                    // Extract route information
                     const route = routes[0]
                     setRouteInfo({
                         distance: route.summary.totalDistance,
@@ -236,7 +235,7 @@ export default function RiderMapView({
     }, [])
 
     return (
-        <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-65px)] relative">
+        <div className="h-[calc(100vh-400px)] md:h-[calc(100vh-65px)] relative">
             <MapContainer
                 center={markers.geocode}
                 zoom={13}
@@ -246,8 +245,10 @@ export default function RiderMapView({
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=7bc8f939ae3246b29e516ccf0e07c43d"
+                    url="https://tile.thunderforest.com/atlas/{z}/{x}/{y}.png?apikey=7bc8f939ae3246b29e516ccf0e07c43d"
                 />
+
+
                 <MapUpdater center={markers.geocode} />
 
                 {/* Driver location marker */}
@@ -272,6 +273,8 @@ export default function RiderMapView({
 
                 {/* Map controls */}
                 <MapControls />
+
+                
             </MapContainer>
         </div>
     )

@@ -6,6 +6,7 @@ import L from "leaflet"
 import "leaflet-routing-machine"
 import { Locate, Plus, Minus, Layers } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import DirectionsStepCard from "../directions/directions"
 
 interface MapViewProps {
     latitude: number | null
@@ -117,33 +118,7 @@ function MapUpdater({ center }: { center: [number, number] }) {
     return null
 }
 
-// Directions card component
-// function DirectionsCard({ routeInfo }: { routeInfo: any }) {
-//     if (!routeInfo) return null
 
-//     return (
-//         <div className="absolute bottom-24 left-4 z-[1000] w-80 bg-white rounded-lg shadow-lg p-4">
-//             <div className="text-base font-medium flex items-center mb-2">
-//                 <Navigation className="h-4 w-4 mr-2" />
-//                 Route Information
-//             </div>
-//             <div className="space-y-2">
-//                 <div className="flex justify-between">
-//                     <span className="text-sm font-medium">Distance:</span>
-//                     <span className="text-sm">
-//                         {routeInfo.distance ? `${(routeInfo.distance / 1000).toFixed(1)} km` : "Calculating..."}
-//                     </span>
-//                 </div>
-//                 <div className="flex justify-between">
-//                     <span className="text-sm font-medium">Duration:</span>
-//                     <span className="text-sm">
-//                         {routeInfo.duration ? `${Math.round(routeInfo.duration / 60)} min` : "Calculating..."}
-//                     </span>
-//                 </div>
-//             </div>
-//         </div>
-//     )
-// }
 
 // Custom routing control component
 function RoutingMachine({ waypoints, setRouteInfo }: { waypoints: L.LatLng[]; setRouteInfo: (info: any) => void }) {
@@ -175,14 +150,11 @@ function RoutingMachine({ waypoints, setRouteInfo }: { waypoints: L.LatLng[]; se
                 }),
             } as any).addTo(map)
 
-            // Store reference to control
             routingControlRef.current = routingControl
 
-            // Listen for route calculation events
             routingControl.on("routesfound", (e) => {
                 const routes = e.routes
                 if (routes && routes.length > 0) {
-                    // Extract route information
                     const route = routes[0]
                     setRouteInfo({
                         distance: route.summary.totalDistance,
@@ -245,10 +217,10 @@ export default function MapView({
     }, [])
 
     return (
-        <div className={`h-[calc(100vh-64px)] md:h-[calc(100vh-65px)] relative z-0 ${className}`} >
+        <div className={`h-[calc(100vh-400px)] md:h-[calc(100vh-65px)] relative z-0 ${className}`} >
             <MapContainer
                 center={markers.geocode}
-                zoom={15}
+                zoom={28}
                 scrollWheelZoom={true}
                 style={{ height: "100%", width: "100%" }}
                 zoomControl={false}
@@ -274,7 +246,13 @@ export default function MapView({
                 {waypoints.length >= 2 && <RoutingMachine waypoints={waypoints} setRouteInfo={setRouteInfo} />}
 
                 {/* Map controls */}
+
+
                 <MapControls />
+
+                {routeInfo?.instructions && (
+                    <DirectionsStepCard instructions={routeInfo.instructions} />
+                )}
             </MapContainer>
         </div >
     )

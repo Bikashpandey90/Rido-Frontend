@@ -265,7 +265,7 @@ const Login = () => {
                                     </CardContent>
                                     <CardFooter className="flex flex-col">
                                         <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 mt-4" disabled={loading}>
-                                            Sign In
+                                            {loading ? "Signing In" : " Sign In"}
                                         </Button>
                                         <p className="mt-4 text-center text-sm text-muted-foreground">
                                             Don&apos;t have an account?{" "}
@@ -322,8 +322,10 @@ const Login = () => {
                                         </div>
                                     </CardContent>
                                     <CardFooter className="flex flex-col">
-                                        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 mt-4">
-                                            Sign In
+                                        <Button type="submit"
+                                            disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 mt-4">
+                                            {loading ? "Signing In" : " Sign In"}
+
                                         </Button>
                                         <p className="mt-4 text-center text-sm text-muted-foreground">
                                             Don&apos;t have an account?{" "}

@@ -180,7 +180,7 @@ export default function RideRequestPanel({
         setIsSubmitting(true)
 
         if (!latitude || !longitude || !destLatitude || !destLongitude) {
-            alert("Please select both pickup and destination locations")
+            alert("Please select destination location")
             setIsSubmitting(false)
             return
         }
@@ -211,7 +211,6 @@ export default function RideRequestPanel({
             socket.emit('newRides', {
                 ride: 'newRide'
             })
-            // Don't set isRideRequested to true here
         } catch (exception: any) {
             console.error("Error submitting ride request:", exception)
             // Check if the exception has a response with data
@@ -617,7 +616,7 @@ export default function RideRequestPanel({
                             <div className="flex justify-center space-x-1">{renderStars()}</div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="review">Additional Comments (Optional)</Label>
+                                <Label htmlFor="review">Additional Comments (Required)</Label>
                                 <Textarea
                                     name="comment"
                                     id="review"
